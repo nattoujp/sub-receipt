@@ -220,36 +220,40 @@
     <!-- LEFT COLUMN: Subscription Picker, Customizer & Benchmark Analytics (7 Cols) -->
     <div class="lg:col-span-7 flex flex-col gap-6">
 
+      <!-- Mode Switcher (3 Viral Calculators in 1) -->
+      <section class="glass-card rounded-3xl p-2 border border-indigo-500/25 bg-slate-900/80 grid grid-cols-3 gap-1.5">
+        <button onclick="switchMode('subs')" id="mode-subs" class="mode-tab py-2.5 px-3 rounded-2xl bg-indigo-600 text-white font-bold text-xs flex flex-col sm:flex-row items-center justify-center gap-1.5 shadow-lg shadow-indigo-500/20 transition">
+          <span class="text-sm">🧾</span>
+          <span>Subscriptions</span>
+        </button>
+        <button onclick="switchMode('habits')" id="mode-habits" class="mode-tab py-2.5 px-3 rounded-2xl text-slate-300 hover:text-white hover:bg-white/5 font-semibold text-xs flex flex-col sm:flex-row items-center justify-center gap-1.5 transition">
+          <span class="text-sm">☕</span>
+          <span>Daily Habits</span>
+        </button>
+        <button onclick="switchMode('saas')" id="mode-saas" class="mode-tab py-2.5 px-3 rounded-2xl text-slate-300 hover:text-white hover:bg-white/5 font-semibold text-xs flex flex-col sm:flex-row items-center justify-center gap-1.5 transition">
+          <span class="text-sm">💻</span>
+          <span>Indie / Dev Stack</span>
+        </button>
+      </section>
+
       <!-- Step 1: Quick-Select Popular Subscriptions -->
       <section class="glass-card rounded-3xl p-5 sm:p-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div>
             <h2 class="text-sm font-bold text-white flex items-center gap-2">
               <span class="w-5 h-5 rounded-full bg-indigo-500 text-white text-xs flex items-center justify-center">1</span>
-              Tap Your Active Subscriptions
+              <span id="step1Title">Tap Your Active Subscriptions</span>
             </h2>
-            <p class="text-xs text-slate-400 mt-0.5">Select from popular services below or add custom ones</p>
+            <p id="step1Desc" class="text-xs text-slate-400 mt-0.5">Select from popular services below or add custom ones</p>
           </div>
-          <div class="flex items-center gap-1.5 flex-wrap">
-            <button onclick="loadDemoPreset('aiBro')" class="text-[11px] px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-indigo-300 border border-white/10 transition">
-              ⚡ AI Power User
-            </button>
-            <button onclick="loadDemoPreset('bingeWatcher')" class="text-[11px] px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-pink-300 border border-white/10 transition">
-              🍿 Streaming Addict
-            </button>
-            <button onclick="clearAllSubs()" class="text-[11px] px-2.5 py-1 rounded-lg bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 border border-white/10 transition">
-              Clear
-            </button>
+          <div id="presetButtonsContainer" class="flex items-center gap-1.5 flex-wrap">
+            <!-- Populated by JS per mode -->
           </div>
         </div>
 
         <!-- Category Filter Tabs -->
-        <div class="flex gap-1.5 overflow-x-auto pb-2 mb-3 border-b border-white/5 text-xs">
-          <button onclick="filterCategory('all')" id="cat-all" class="cat-tab px-3 py-1.5 rounded-xl bg-white text-slate-950 font-semibold whitespace-nowrap transition">All Popular</button>
-          <button onclick="filterCategory('streaming')" id="cat-streaming" class="cat-tab px-3 py-1.5 rounded-xl bg-white/5 text-slate-300 hover:text-white whitespace-nowrap transition">🎬 Video & TV</button>
-          <button onclick="filterCategory('ai')" id="cat-ai" class="cat-tab px-3 py-1.5 rounded-xl bg-white/5 text-slate-300 hover:text-white whitespace-nowrap transition">🤖 AI & Dev</button>
-          <button onclick="filterCategory('music')" id="cat-music" class="cat-tab px-3 py-1.5 rounded-xl bg-white/5 text-slate-300 hover:text-white whitespace-nowrap transition">🎵 Music & Gaming</button>
-          <button onclick="filterCategory('lifestyle')" id="cat-lifestyle" class="cat-tab px-3 py-1.5 rounded-xl bg-white/5 text-slate-300 hover:text-white whitespace-nowrap transition">☁️ Cloud & Life</button>
+        <div id="categoryTabsContainer" class="flex gap-1.5 overflow-x-auto pb-2 mb-3 border-b border-white/5 text-xs">
+          <!-- Populated by JS per mode -->
         </div>
 
         <!-- Popular Services Grid -->
@@ -295,7 +299,9 @@
           <div class="flex items-center gap-1.5 w-full sm:w-auto">
             <input type="number" id="customPrice" step="0.01" min="0" placeholder="Price" class="w-24 bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500" required />
             <select id="customCycle" class="bg-black/40 border border-white/10 rounded-xl px-2.5 py-2 text-xs text-slate-200 focus:outline-none">
-              <option value="monthly">/ mo</option>
+              <option value="daily">/ day</option>
+              <option value="weekly">/ wk</option>
+              <option value="monthly" selected>/ mo</option>
               <option value="yearly">/ yr</option>
             </select>
             <button type="submit" class="px-4 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white font-semibold text-xs transition whitespace-nowrap">
@@ -417,8 +423,8 @@
           
           <!-- Store Header -->
           <div class="text-center">
-            <div class="text-xl font-bold tracking-widest">SUBSCRIPTION MART</div>
-            <div class="text-[11px] opacity-75 mt-0.5">DIGITAL RECURRING CHARGES DIVISION</div>
+            <div id="receiptStoreTitle" class="text-xl font-bold tracking-widest">SUBSCRIPTION MART</div>
+            <div id="receiptStoreSub" class="text-[11px] opacity-75 mt-0.5">DIGITAL RECURRING CHARGES DIVISION</div>
             <div class="text-[10px] opacity-60 mt-1" id="receiptMetaDate">ORDER #4092 • 2026-11-07</div>
             <div class="text-[11px] font-bold mt-1" id="receiptCustomerLabel">CUSTOMER: ALEX</div>
           </div>
@@ -600,45 +606,146 @@
        APPLICATION & VIRAL URL SYNC SCRIPT
        ========================================================= -->
   <script>
-    const US_AVERAGE_MONTHLY_USD = 91.00; // Average monthly subscription spend benchmark
+    const MODE_CONFIG = {
+      subs: {
+        storeTitle: 'SUBSCRIPTION MART',
+        storeSub: 'DIGITAL RECURRING CHARGES DIVISION',
+        step1Title: 'Tap Your Active Subscriptions',
+        step1Desc: 'Select from popular services below or add custom ones',
+        avgUsd: 91.00,
+        defaultIds: ['netflix', 'spotify', 'chatgpt', 'prime', 'icloud'],
+        presets: [
+          { key: 'aiBro', label: '⚡ AI Power User', color: 'text-indigo-300', ids: ['chatgpt', 'claude', 'cursor', 'copilot', 'spotify', 'ytprem', 'xprem'] },
+          { key: 'bingeWatcher', label: '🍿 Streaming Addict', color: 'text-pink-300', ids: ['netflix', 'disney', 'max', 'prime', 'ytprem', 'spotify', 'icloud'] }
+        ],
+        categories: [
+          { id: 'all', label: 'All Popular' },
+          { id: 'streaming', label: '🎬 Video & TV' },
+          { id: 'ai', label: '🤖 AI & Dev' },
+          { id: 'music', label: '🎵 Music & Gaming' },
+          { id: 'lifestyle', label: '☁️ Cloud & Life' }
+        ],
+        catalog: [
+          // Streaming
+          { id: 'netflix', name: 'Netflix Standard', category: 'streaming', baseUsd: 15.49, cycle: 'monthly', emoji: '🎬' },
+          { id: 'ytprem', name: 'YouTube Premium', category: 'streaming', baseUsd: 13.99, cycle: 'monthly', emoji: '▶️' },
+          { id: 'disney', name: 'Disney+ Bundle', category: 'streaming', baseUsd: 14.99, cycle: 'monthly', emoji: '🏰' },
+          { id: 'max', name: 'Max (HBO)', category: 'streaming', baseUsd: 16.99, cycle: 'monthly', emoji: '📺' },
+          { id: 'prime', name: 'Amazon Prime', category: 'streaming', baseUsd: 14.99, cycle: 'monthly', emoji: '📦' },
+          { id: 'crunchyroll', name: 'Crunchyroll', category: 'streaming', baseUsd: 9.99, cycle: 'monthly', emoji: '🍥' },
+          { id: 'hulu', name: 'Hulu (No Ads)', category: 'streaming', baseUsd: 17.99, cycle: 'monthly', emoji: '🟢' },
+          { id: 'appletv', name: 'Apple TV+', category: 'streaming', baseUsd: 9.99, cycle: 'monthly', emoji: '🍎' },
 
-    const CATALOG = [
-      // Streaming
-      { id: 'netflix', name: 'Netflix Standard', category: 'streaming', baseUsd: 15.49, emoji: '🎬' },
-      { id: 'ytprem', name: 'YouTube Premium', category: 'streaming', baseUsd: 13.99, emoji: '▶️' },
-      { id: 'disney', name: 'Disney+ Bundle', category: 'streaming', baseUsd: 14.99, emoji: '🏰' },
-      { id: 'max', name: 'Max (HBO)', category: 'streaming', baseUsd: 16.99, emoji: '📺' },
-      { id: 'prime', name: 'Amazon Prime', category: 'streaming', baseUsd: 14.99, emoji: '📦' },
-      { id: 'crunchyroll', name: 'Crunchyroll', category: 'streaming', baseUsd: 9.99, emoji: '🍥' },
-      { id: 'hulu', name: 'Hulu (No Ads)', category: 'streaming', baseUsd: 17.99, emoji: '🟢' },
-      { id: 'appletv', name: 'Apple TV+', category: 'streaming', baseUsd: 9.99, emoji: '🍎' },
+          // AI & Dev
+          { id: 'chatgpt', name: 'ChatGPT Plus', category: 'ai', baseUsd: 20.00, cycle: 'monthly', emoji: '🤖' },
+          { id: 'claude', name: 'Claude Pro', category: 'ai', baseUsd: 20.00, cycle: 'monthly', emoji: '🧠' },
+          { id: 'cursor', name: 'Cursor Pro', category: 'ai', baseUsd: 20.00, cycle: 'monthly', emoji: '⚡' },
+          { id: 'midjourney', name: 'Midjourney', category: 'ai', baseUsd: 10.00, cycle: 'monthly', emoji: '🎨' },
+          { id: 'copilot', name: 'GitHub Copilot', category: 'ai', baseUsd: 10.00, cycle: 'monthly', emoji: '🐙' },
+          { id: 'perplexity', name: 'Perplexity Pro', category: 'ai', baseUsd: 20.00, cycle: 'monthly', emoji: '🔍' },
 
-      // AI & Dev
-      { id: 'chatgpt', name: 'ChatGPT Plus', category: 'ai', baseUsd: 20.00, emoji: '🤖' },
-      { id: 'claude', name: 'Claude Pro', category: 'ai', baseUsd: 20.00, emoji: '🧠' },
-      { id: 'cursor', name: 'Cursor Pro', category: 'ai', baseUsd: 20.00, emoji: '⚡' },
-      { id: 'midjourney', name: 'Midjourney', category: 'ai', baseUsd: 10.00, emoji: '🎨' },
-      { id: 'copilot', name: 'GitHub Copilot', category: 'ai', baseUsd: 10.00, emoji: '🐙' },
-      { id: 'perplexity', name: 'Perplexity Pro', category: 'ai', baseUsd: 20.00, emoji: '🔍' },
+          // Music & Gaming
+          { id: 'spotify', name: 'Spotify Premium', category: 'music', baseUsd: 11.99, cycle: 'monthly', emoji: '🎧' },
+          { id: 'applemusic', name: 'Apple Music', category: 'music', baseUsd: 10.99, cycle: 'monthly', emoji: '🎵' },
+          { id: 'gamepass', name: 'Xbox Game Pass', category: 'music', baseUsd: 19.99, cycle: 'monthly', emoji: '🎮' },
+          { id: 'psplus', name: 'PlayStation Plus', category: 'music', baseUsd: 14.99, cycle: 'monthly', emoji: '🕹️' },
+          { id: 'discord', name: 'Discord Nitro', category: 'music', baseUsd: 9.99, cycle: 'monthly', emoji: '👾' },
+          { id: 'audible', name: 'Audible Plus', category: 'music', baseUsd: 14.95, cycle: 'monthly', emoji: '📖' },
 
-      // Music & Gaming
-      { id: 'spotify', name: 'Spotify Premium', category: 'music', baseUsd: 11.99, emoji: '🎧' },
-      { id: 'applemusic', name: 'Apple Music', category: 'music', baseUsd: 10.99, emoji: '🎵' },
-      { id: 'gamepass', name: 'Xbox Game Pass', category: 'music', baseUsd: 19.99, emoji: '🎮' },
-      { id: 'psplus', name: 'PlayStation Plus', category: 'music', baseUsd: 14.99, emoji: '🕹️' },
-      { id: 'discord', name: 'Discord Nitro', category: 'music', baseUsd: 9.99, emoji: '👾' },
-      { id: 'audible', name: 'Audible Plus', category: 'music', baseUsd: 14.95, emoji: '📖' },
+          // Cloud & Lifestyle
+          { id: 'icloud', name: 'iCloud+ (2TB)', category: 'lifestyle', baseUsd: 9.99, cycle: 'monthly', emoji: '☁️' },
+          { id: 'googleone', name: 'Google One AI', category: 'lifestyle', baseUsd: 9.99, cycle: 'monthly', emoji: '🌈' },
+          { id: 'adobe', name: 'Adobe Creative Cloud', category: 'lifestyle', baseUsd: 59.99, cycle: 'monthly', emoji: '🖌️' },
+          { id: 'notion', name: 'Notion Plus', category: 'lifestyle', baseUsd: 10.00, cycle: 'monthly', emoji: '📝' },
+          { id: 'xprem', name: 'X Premium', category: 'lifestyle', baseUsd: 8.00, cycle: 'monthly', emoji: '✖️' },
+          { id: 'duolingo', name: 'Super Duolingo', category: 'lifestyle', baseUsd: 12.99, cycle: 'monthly', emoji: '🦉' },
+          { id: 'gym', name: 'Gym Membership', category: 'lifestyle', baseUsd: 45.00, cycle: 'monthly', emoji: '🏋️' },
+          { id: 'nytimes', name: 'NYT All Access', category: 'lifestyle', baseUsd: 17.00, cycle: 'monthly', emoji: '📰' }
+        ]
+      },
+      habits: {
+        storeTitle: 'DAILY HABIT CAFE',
+        storeSub: 'LATTE FACTOR & IMPULSE SPEND DIVISION',
+        step1Title: 'Tap Your Daily & Weekly Habits',
+        step1Desc: 'See how small daily/weekly treats compound over 10 years in the S&P 500',
+        avgUsd: 165.00,
+        defaultIds: ['latte', 'doordash', 'energydrink', 'snacks'],
+        presets: [
+          { key: 'caffeine', label: '☕ Caffeine & Takeout', color: 'text-amber-300', ids: ['latte', 'energydrink', 'pastry', 'lunchout', 'doordash'] },
+          { key: 'nightlife', label: '🍕 Weekend Impulse', color: 'text-rose-300', ids: ['doordash', 'craftbeer', 'rideshare', 'amazonimp', 'gacha'] }
+        ],
+        categories: [
+          { id: 'all', label: 'All Habits' },
+          { id: 'coffee', label: '☕ Coffee & Drinks' },
+          { id: 'food', label: '🍔 Food & Delivery' },
+          { id: 'vice', label: '🛍️ Impulse & Life' }
+        ],
+        catalog: [
+          // Coffee & Drinks
+          { id: 'latte', name: 'Iced Latte / Coffee', category: 'coffee', baseUsd: 5.75, cycle: 'daily', emoji: '☕' },
+          { id: 'energydrink', name: 'Energy Drink (Monster/RedBull)', category: 'coffee', baseUsd: 3.50, cycle: 'daily', emoji: '⚡' },
+          { id: 'boba', name: 'Boba / Bubble Tea', category: 'coffee', baseUsd: 6.75, cycle: 'weekly', emoji: '🧋' },
+          { id: 'smoothie', name: 'Protein Shake / Smoothie', category: 'coffee', baseUsd: 8.50, cycle: 'weekly', emoji: '🥤' },
+          { id: 'craftbeer', name: 'Bar Drinks / Wine', category: 'coffee', baseUsd: 28.00, cycle: 'weekly', emoji: '🍺' },
 
-      // Cloud & Lifestyle
-      { id: 'icloud', name: 'iCloud+ (2TB)', category: 'lifestyle', baseUsd: 9.99, emoji: '☁️' },
-      { id: 'googleone', name: 'Google One AI', category: 'lifestyle', baseUsd: 9.99, emoji: '🌈' },
-      { id: 'adobe', name: 'Adobe Creative Cloud', category: 'lifestyle', baseUsd: 59.99, emoji: '🖌️' },
-      { id: 'notion', name: 'Notion Plus', category: 'lifestyle', baseUsd: 10.00, emoji: '📝' },
-      { id: 'xprem', name: 'X Premium', category: 'lifestyle', baseUsd: 8.00, emoji: '✖️' },
-      { id: 'duolingo', name: 'Super Duolingo', category: 'lifestyle', baseUsd: 12.99, emoji: '🦉' },
-      { id: 'gym', name: 'Gym Membership', category: 'lifestyle', baseUsd: 45.00, emoji: '🏋️' },
-      { id: 'nytimes', name: 'NYT All Access', category: 'lifestyle', baseUsd: 17.00, emoji: '📰' }
-    ];
+          // Food & Delivery
+          { id: 'doordash', name: 'UberEats / DoorDash', category: 'food', baseUsd: 32.00, cycle: 'weekly', emoji: '🛵' },
+          { id: 'lunchout', name: 'Workday Lunch Out', category: 'food', baseUsd: 14.50, cycle: 'daily', emoji: '🥗' },
+          { id: 'pastry', name: 'Morning Bakery / Croissant', category: 'food', baseUsd: 4.25, cycle: 'daily', emoji: '🥐' },
+          { id: 'snacks', name: 'Convenience Store Run', category: 'food', baseUsd: 4.50, cycle: 'daily', emoji: '🍫' },
+          { id: 'fastfood', name: 'Late Night Drive-Thru', category: 'food', baseUsd: 13.00, cycle: 'weekly', emoji: '🍟' },
+
+          // Impulse & Life
+          { id: 'rideshare', name: 'Uber / Lyft Rides', category: 'vice', baseUsd: 35.00, cycle: 'weekly', emoji: '🚕' },
+          { id: 'amazonimp', name: 'Amazon Impulse Buys', category: 'vice', baseUsd: 40.00, cycle: 'weekly', emoji: '📦' },
+          { id: 'vape', name: 'Vape / Nicotine', category: 'vice', baseUsd: 7.50, cycle: 'daily', emoji: '💨' },
+          { id: 'gacha', name: 'Game Skins / Gacha Pulls', category: 'vice', baseUsd: 15.00, cycle: 'weekly', emoji: '🎲' },
+          { id: 'lottery', name: 'Lottery / Sports Picks', category: 'vice', baseUsd: 12.00, cycle: 'weekly', emoji: '🎟️' }
+        ]
+      },
+      saas: {
+        storeTitle: 'CLOUD INFRA MART',
+        storeSub: 'INDIE HACKER & DEV STACK DIVISION',
+        step1Title: 'Tap Your Dev & SaaS Stack',
+        step1Desc: 'Calculate your monthly burn before shipping your next side project',
+        avgUsd: 120.00,
+        defaultIds: ['cursor_s', 'claude_s', 'vercel_s', 'supabase_s', 'domains_s'],
+        presets: [
+          { key: 'vibeCoder', label: '🚀 Vibe Coder Stack', color: 'text-emerald-300', ids: ['cursor_s', 'claude_max', 'v0_s', 'vercel_s', 'supabase_s', 'domains_s'] },
+          { key: 'indieFounder', label: '📈 Indie Founder', color: 'text-indigo-300', ids: ['cursor_s', 'vercel_s', 'aws_s', 'xprem_plus', 'beehiiv_s', 'ahrefs_s'] }
+        ],
+        categories: [
+          { id: 'all', label: 'All Stack' },
+          { id: 'aidev', label: '🤖 AI & Coding' },
+          { id: 'infra', label: '☁️ Hosting & DB' },
+          { id: 'growth', label: '📈 Growth & Design' }
+        ],
+        catalog: [
+          // AI & Coding
+          { id: 'cursor_s', name: 'Cursor Pro', category: 'aidev', baseUsd: 20.00, cycle: 'monthly', emoji: '⚡' },
+          { id: 'claude_s', name: 'Claude Pro', category: 'aidev', baseUsd: 20.00, cycle: 'monthly', emoji: '🧠' },
+          { id: 'claude_max', name: 'Claude Max (5x)', category: 'aidev', baseUsd: 100.00, cycle: 'monthly', emoji: '🔥' },
+          { id: 'chatgpt_pro', name: 'ChatGPT Pro', category: 'aidev', baseUsd: 200.00, cycle: 'monthly', emoji: '🤖' },
+          { id: 'v0_s', name: 'v0 / Bolt.new Pro', category: 'aidev', baseUsd: 20.00, cycle: 'monthly', emoji: '✨' },
+          { id: 'openai_api', name: 'LLM API Credits', category: 'aidev', baseUsd: 35.00, cycle: 'monthly', emoji: '🔌' },
+
+          // Hosting & DB
+          { id: 'vercel_s', name: 'Vercel Pro', category: 'infra', baseUsd: 20.00, cycle: 'monthly', emoji: '▲' },
+          { id: 'supabase_s', name: 'Supabase Pro', category: 'infra', baseUsd: 25.00, cycle: 'monthly', emoji: '⚡' },
+          { id: 'aws_s', name: 'AWS / GCP Bill', category: 'infra', baseUsd: 45.00, cycle: 'monthly', emoji: '☁️' },
+          { id: 'railway_s', name: 'Railway / Render', category: 'infra', baseUsd: 15.00, cycle: 'monthly', emoji: '🛤️' },
+          { id: 'cf_s', name: 'Cloudflare Pro', category: 'infra', baseUsd: 25.00, cycle: 'monthly', emoji: '🛡️' },
+          { id: 'domains_s', name: '15 Unused .com/.ai Domains', category: 'infra', baseUsd: 240.00, cycle: 'yearly', emoji: '🌐' },
+
+          // Growth & Design
+          { id: 'xprem_plus', name: 'X Premium+', category: 'growth', baseUsd: 22.00, cycle: 'monthly', emoji: '✖️' },
+          { id: 'figma_s', name: 'Figma Professional', category: 'growth', baseUsd: 15.00, cycle: 'monthly', emoji: '🎨' },
+          { id: 'framer_s', name: 'Framer / Webflow', category: 'growth', baseUsd: 23.00, cycle: 'monthly', emoji: '🖼️' },
+          { id: 'beehiiv_s', name: 'Beehiiv / ConvertKit', category: 'growth', baseUsd: 39.00, cycle: 'monthly', emoji: '📩' },
+          { id: 'ahrefs_s', name: 'Ahrefs / Semrush', category: 'growth', baseUsd: 99.00, cycle: 'monthly', emoji: '🔍' }
+        ]
+      }
+    };
 
     const CURRENCY_MAP = {
       USD: { code: 'USD', symbol: '$', rate: 1 },
@@ -647,11 +754,20 @@
       JPY: { code: 'JPY', symbol: '¥', rate: 150 }
     };
 
+    let currentMode = 'subs';
     let currentCategory = 'all';
     let currency = CURRENCY_MAP.USD;
     let currentTheme = 'classic';
-    // Each item: { id, name, emoji, price, cycle: 'monthly'|'yearly', active: true|false }
     let selectedSubs = [];
+    const modeItemsCache = { subs: null, habits: null, saas: null };
+
+    function getActiveConfig() {
+      return MODE_CONFIG[currentMode] || MODE_CONFIG.subs;
+    }
+
+    function getAllCatalogItems() {
+      return [...MODE_CONFIG.subs.catalog, ...MODE_CONFIG.habits.catalog, ...MODE_CONFIG.saas.catalog];
+    }
 
     function formatMoney(amount) {
       if (currency.code === 'JPY') {
@@ -660,15 +776,89 @@
       return `${currency.symbol}${amount.toFixed(2)}`;
     }
 
+    function convertUsdToCurrent(usdVal) {
+      return currency.code === 'JPY'
+        ? Math.round((usdVal * currency.rate) / 10) * 10
+        : Number((usdVal * currency.rate).toFixed(2));
+    }
+
+    function switchMode(newMode, skipPresetInit = false) {
+      if (!MODE_CONFIG[newMode]) return;
+      modeItemsCache[currentMode] = [...selectedSubs];
+      currentMode = newMode;
+      currentCategory = 'all';
+
+      document.querySelectorAll('.mode-tab').forEach(btn => {
+        btn.className = 'mode-tab py-2.5 px-3 rounded-2xl text-slate-300 hover:text-white hover:bg-white/5 font-semibold text-xs flex flex-col sm:flex-row items-center justify-center gap-1.5 transition';
+      });
+      const activeModeBtn = document.getElementById(`mode-${newMode}`);
+      if (activeModeBtn) {
+        activeModeBtn.className = 'mode-tab py-2.5 px-3 rounded-2xl bg-indigo-600 text-white font-bold text-xs flex flex-col sm:flex-row items-center justify-center gap-1.5 shadow-lg shadow-indigo-500/20 transition';
+      }
+
+      const cfg = getActiveConfig();
+      document.getElementById('step1Title').textContent = cfg.step1Title;
+      document.getElementById('step1Desc').textContent = cfg.step1Desc;
+      document.getElementById('receiptStoreTitle').textContent = cfg.storeTitle;
+      document.getElementById('receiptStoreSub').textContent = cfg.storeSub;
+      document.getElementById('customCycle').value = newMode === 'habits' ? 'daily' : 'monthly';
+
+      renderModeControls();
+
+      if (!skipPresetInit) {
+        if (modeItemsCache[newMode] && modeItemsCache[newMode].length > 0) {
+          selectedSubs = [...modeItemsCache[newMode]];
+        } else {
+          selectedSubs = cfg.defaultIds.map(id => {
+            const found = cfg.catalog.find(c => c.id === id);
+            return found ? {
+              id: found.id,
+              name: found.name,
+              emoji: found.emoji,
+              price: convertUsdToCurrent(found.baseUsd),
+              cycle: found.cycle || 'monthly',
+              active: true
+            } : null;
+          }).filter(Boolean);
+        }
+        onStateChange();
+      }
+    }
+
+    function renderModeControls() {
+      const cfg = getActiveConfig();
+      const presetContainer = document.getElementById('presetButtonsContainer');
+      presetContainer.innerHTML = cfg.presets.map(p => `
+        <button onclick="loadDemoPreset('${p.key}')" class="text-[11px] px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 ${p.color} border border-white/10 transition">
+          ${p.label}
+        </button>
+      `).join('') + `
+        <button onclick="clearAllSubs()" class="text-[11px] px-2.5 py-1 rounded-lg bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 border border-white/10 transition">
+          Clear
+        </button>
+      `;
+
+      const catContainer = document.getElementById('categoryTabsContainer');
+      catContainer.innerHTML = cfg.categories.map(cat => `
+        <button onclick="filterCategory('${cat.id}')" id="cat-${cat.id}" class="cat-tab px-3 py-1.5 rounded-xl ${cat.id === currentCategory ? 'bg-white text-slate-950 font-semibold' : 'bg-white/5 text-slate-300 hover:text-white'} whitespace-nowrap transition">
+          ${cat.label}
+        </button>
+      `).join('');
+    }
+
     function setCurrency(code, symbol, rate, skipConversion = false) {
       const oldRate = currency.rate;
       currency = { code, symbol, rate };
 
       if (!skipConversion) {
-        selectedSubs = selectedSubs.map(item => {
+        const convertList = (list) => list.map(item => {
           const usdVal = item.price / oldRate;
           const newVal = code === 'JPY' ? Math.round((usdVal * rate) / 10) * 10 : Number((usdVal * rate).toFixed(2));
           return { ...item, price: newVal };
+        });
+        selectedSubs = convertList(selectedSubs);
+        Object.keys(modeItemsCache).forEach(k => {
+          if (modeItemsCache[k]) modeItemsCache[k] = convertList(modeItemsCache[k]);
         });
       }
 
@@ -683,28 +873,32 @@
 
     function filterCategory(cat) {
       currentCategory = cat;
-      document.querySelectorAll('.cat-tab').forEach(btn => {
-        btn.className = 'cat-tab px-3 py-1.5 rounded-xl bg-white/5 text-slate-300 hover:text-white whitespace-nowrap transition';
-      });
-      document.getElementById(`cat-${cat}`).className = 'cat-tab px-3 py-1.5 rounded-xl bg-white text-slate-950 font-semibold whitespace-nowrap transition';
+      renderModeControls();
       renderCatalog();
+    }
+
+    function getCycleBadgeLabel(cycle) {
+      if (cycle === 'daily') return '/d';
+      if (cycle === 'weekly') return '/wk';
+      if (cycle === 'yearly') return '/yr';
+      return '/mo';
     }
 
     function renderCatalog() {
       const grid = document.getElementById('catalogGrid');
-      const items = currentCategory === 'all' ? CATALOG : CATALOG.filter(c => c.category === currentCategory);
+      const catalog = getActiveConfig().catalog;
+      const items = currentCategory === 'all' ? catalog : catalog.filter(c => c.category === currentCategory);
 
       grid.innerHTML = items.map(item => {
         const isSelected = selectedSubs.some(s => s.id === item.id);
-        const convertedPrice = currency.code === 'JPY'
-          ? Math.round((item.baseUsd * currency.rate) / 10) * 10
-          : Number((item.baseUsd * currency.rate).toFixed(2));
+        const convertedPrice = convertUsdToCurrent(item.baseUsd);
+        const cycSuffix = getCycleBadgeLabel(item.cycle || 'monthly');
 
         return `
           <button onclick="toggleCatalogItem('${item.id}')" class="service-chip ${isSelected ? 'selected' : ''} p-3 rounded-2xl text-left flex flex-col justify-between gap-1.5">
             <div class="flex items-center justify-between w-full">
               <span class="text-lg">${item.emoji}</span>
-              <span class="text-[11px] font-mono ${isSelected ? 'text-indigo-300 font-bold' : 'text-slate-400'}">${formatMoney(convertedPrice)}</span>
+              <span class="text-[11px] font-mono ${isSelected ? 'text-indigo-300 font-bold' : 'text-slate-400'}">${formatMoney(convertedPrice)}${cycSuffix}</span>
             </div>
             <div class="text-xs font-semibold text-white truncate w-full">${item.name}</div>
           </button>
@@ -717,17 +911,14 @@
       if (exists) {
         selectedSubs = selectedSubs.filter(s => s.id !== id);
       } else {
-        const found = CATALOG.find(c => c.id === id);
+        const found = getActiveConfig().catalog.find(c => c.id === id);
         if (!found) return;
-        const price = currency.code === 'JPY'
-          ? Math.round((found.baseUsd * currency.rate) / 10) * 10
-          : Number((found.baseUsd * currency.rate).toFixed(2));
         selectedSubs.push({
           id: found.id,
           name: found.name,
           emoji: found.emoji,
-          price,
-          cycle: 'monthly',
+          price: convertUsdToCurrent(found.baseUsd),
+          cycle: found.cycle || 'monthly',
           active: true
         });
       }
@@ -797,7 +988,7 @@
       document.getElementById('selectedCountBadge').textContent = `${activeCount} active / ${selectedSubs.length} total`;
 
       if (selectedSubs.length === 0) {
-        container.innerHTML = `<div class="text-xs text-slate-500 text-center py-4">No subscriptions selected yet. Tap services above!</div>`;
+        container.innerHTML = `<div class="text-xs text-slate-500 text-center py-4">No items selected yet. Tap presets or items above!</div>`;
         return;
       }
 
@@ -806,7 +997,7 @@
         return `
           <div class="flex items-center justify-between gap-2 ${isKept ? 'bg-white/5 border-white/5' : 'bg-rose-950/20 border-rose-500/20 opacity-60'} border px-3 py-2 rounded-xl text-xs transition">
             <label class="flex items-center gap-2.5 min-w-0 flex-1 cursor-pointer">
-              <input type="checkbox" ${isKept ? 'checked' : ''} onchange="toggleSubKeepStatus('${s.id}')" title="Uncheck to simulate canceling this subscription" class="rounded bg-black/50 border-white/20 text-emerald-500 focus:ring-0" />
+              <input type="checkbox" ${isKept ? 'checked' : ''} onchange="toggleSubKeepStatus('${s.id}')" title="Uncheck to simulate canceling this item" class="rounded bg-black/50 border-white/20 text-emerald-500 focus:ring-0" />
               <span>${s.emoji}</span>
               <span class="font-medium ${isKept ? 'text-white' : 'line-through text-slate-400'} truncate">${s.name}</span>
             </label>
@@ -814,6 +1005,8 @@
               <span class="text-slate-400 font-mono">${currency.symbol}</span>
               <input type="number" step="0.01" value="${s.price}" oninput="updateSubPrice('${s.id}', this.value)" class="w-20 bg-black/50 border border-white/10 rounded-lg px-2 py-1 text-right font-mono text-white focus:outline-none focus:border-indigo-500" />
               <select onchange="updateSubCycle('${s.id}', this.value)" class="bg-black/50 border border-white/10 rounded-lg px-1.5 py-1 text-slate-300">
+                <option value="daily" ${s.cycle === 'daily' ? 'selected' : ''}>/day</option>
+                <option value="weekly" ${s.cycle === 'weekly' ? 'selected' : ''}>/wk</option>
                 <option value="monthly" ${s.cycle === 'monthly' ? 'selected' : ''}>/mo</option>
                 <option value="yearly" ${s.cycle === 'yearly' ? 'selected' : ''}>/yr</option>
               </select>
@@ -828,7 +1021,17 @@
     }
 
     function getMonthlyEquivalent(item) {
-      return item.cycle === 'yearly' ? item.price / 12 : item.price;
+      if (item.cycle === 'daily') return item.price * 30.4167;
+      if (item.cycle === 'weekly') return item.price * 4.345;
+      if (item.cycle === 'yearly') return item.price / 12;
+      return item.price;
+    }
+
+    function formatReceiptLineLabel(item) {
+      if (item.cycle === 'daily') return `30x ${item.name.toUpperCase()}`;
+      if (item.cycle === 'weekly') return `4x ${item.name.toUpperCase()}`;
+      if (item.cycle === 'yearly') return `1x ${item.name.toUpperCase()} (YR/12)`;
+      return `1x ${item.name.toUpperCase()}`;
     }
 
     function calcCompound10Yr(monthlyContribution) {
@@ -864,7 +1067,19 @@
     }
 
     function getVerdictStamp(monthlyUsdEquivalent) {
-      if (monthlyUsdEquivalent === 0) return 'MONK MODE (ZERO SUBS)';
+      if (monthlyUsdEquivalent === 0) return 'MONK MODE (ZERO BURN)';
+      if (currentMode === 'habits') {
+        if (monthlyUsdEquivalent < 60) return 'DISCIPLINED SAVER';
+        if (monthlyUsdEquivalent < 160) return 'CASUAL TREAT ENJOYER';
+        if (monthlyUsdEquivalent < 320) return 'CERTIFIED LATTE ADDICT';
+        return 'CEO OF IMPULSE SPENDING';
+      }
+      if (currentMode === 'saas') {
+        if (monthlyUsdEquivalent < 45) return 'LEAN BOOTSTRAPPER';
+        if (monthlyUsdEquivalent < 110) return 'PRAGMATIC BUILDER';
+        if (monthlyUsdEquivalent < 220) return 'CERTIFIED VIBE CODER';
+        return 'SERIES-A BURN RATE';
+      }
       if (monthlyUsdEquivalent < 35) return 'FRUGAL MINIMALIST';
       if (monthlyUsdEquivalent < 80) return 'BALANCED DIGITAL CITIZEN';
       if (monthlyUsdEquivalent < 140) return 'CERTIFIED SUB COLLECTOR';
@@ -874,6 +1089,8 @@
     function renderReceiptAndBenchmark() {
       const customer = (document.getElementById('customerNameInput').value || 'ALEX').toUpperCase();
       const today = new Date().toISOString().slice(0, 10);
+      const cfg = getActiveConfig();
+      const avgUsdBenchmark = cfg.avgUsd || 91.00;
 
       const {
         activeItems,
@@ -886,6 +1103,8 @@
         paused10Yr
       } = calculateTotals();
 
+      document.getElementById('receiptStoreTitle').textContent = cfg.storeTitle;
+      document.getElementById('receiptStoreSub').textContent = cfg.storeSub;
       document.getElementById('receiptMetaDate').textContent = `ORDER #${1000 + activeItems.length * 37} • ${today}`;
       document.getElementById('receiptCustomerLabel').textContent = `CUSTOMER: ${customer}`;
 
@@ -903,26 +1122,25 @@
       // Receipt Items
       const itemsContainer = document.getElementById('receiptItemsContainer');
       if (activeItems.length === 0) {
-        itemsContainer.innerHTML = `<div class="text-center py-4 opacity-50">NO ACTIVE SUBSCRIPTIONS</div>`;
+        itemsContainer.innerHTML = `<div class="text-center py-4 opacity-50">NO ACTIVE ITEMS</div>`;
       } else {
         itemsContainer.innerHTML = activeItems.map((item) => {
           const monthlyEq = getMonthlyEquivalent(item);
-          const suffix = item.cycle === 'yearly' ? ' (YR/12)' : '';
           return `
             <div class="flex justify-between items-baseline gap-2">
-              <span class="truncate">1x ${item.name.toUpperCase()}${suffix}</span>
+              <span class="truncate">${formatReceiptLineLabel(item)}</span>
               <span class="font-bold shrink-0">${formatMoney(monthlyEq)}</span>
             </div>
           `;
         }).join('');
       }
 
-      // Global Benchmark Comparison ($91 USD average)
-      const avgInCurrentCurrency = US_AVERAGE_MONTHLY_USD * currency.rate;
+      // Global Benchmark Comparison
+      const avgInCurrentCurrency = avgUsdBenchmark * currency.rate;
       document.getElementById('avgBenchmarkLabel').textContent = formatMoney(avgInCurrentCurrency);
 
       const monthlyInUsd = monthlyTotal / currency.rate;
-      const diffPct = Math.round(((monthlyInUsd - US_AVERAGE_MONTHLY_USD) / US_AVERAGE_MONTHLY_USD) * 100);
+      const diffPct = Math.round(((monthlyInUsd - avgUsdBenchmark) / avgUsdBenchmark) * 100);
       const vsAvgText = diffPct > 0 ? `+${diffPct}% ABOVE AVG` : `${diffPct}% BELOW AVG`;
 
       document.getElementById('receiptItemCount').textContent = activeItems.length;
@@ -934,12 +1152,12 @@
       document.getElementById('receiptVerdictStamp').textContent = getVerdictStamp(monthlyInUsd);
 
       // Update Benchmark Bar UI
-      const barWidthPct = Math.min(100, Math.round((monthlyInUsd / (US_AVERAGE_MONTHLY_USD * 2)) * 100));
+      const barWidthPct = Math.min(100, Math.round((monthlyInUsd / (avgUsdBenchmark * 2)) * 100));
       document.getElementById('benchmarkProgressBar').style.width = `${barWidthPct}%`;
       document.getElementById('benchmarkDiffText').textContent = `${formatMoney(monthlyTotal)}/mo (${vsAvgText})`;
 
       const badge = document.getElementById('benchmarkBadge');
-      if (monthlyInUsd <= US_AVERAGE_MONTHLY_USD) {
+      if (monthlyInUsd <= avgUsdBenchmark) {
         badge.textContent = `✅ ${Math.abs(diffPct)}% Below Global Avg`;
         badge.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
       } else {
@@ -962,38 +1180,55 @@
       if (!skipSync) syncUrlParams();
     }
 
-    function loadDemoPreset(preset) {
-      selectedSubs = [];
-      const ids = preset === 'aiBro'
-        ? ['chatgpt', 'claude', 'cursor', 'copilot', 'spotify', 'ytprem', 'xprem']
-        : ['netflix', 'disney', 'max', 'prime', 'ytprem', 'spotify', 'icloud'];
+    function loadDemoPreset(presetKey) {
+      const cfg = getActiveConfig();
+      const presetObj = cfg.presets.find(p => p.key === presetKey) || cfg.presets[0];
+      if (!presetObj) return;
 
-      ids.forEach(id => {
-        const found = CATALOG.find(c => c.id === id);
-        if (found) {
-          const price = currency.code === 'JPY'
-            ? Math.round((found.baseUsd * currency.rate) / 10) * 10
-            : Number((found.baseUsd * currency.rate).toFixed(2));
-          selectedSubs.push({ id: found.id, name: found.name, emoji: found.emoji, price, cycle: 'monthly', active: true });
-        }
-      });
+      selectedSubs = presetObj.ids.map(id => {
+        const found = cfg.catalog.find(c => c.id === id);
+        if (!found) return null;
+        return {
+          id: found.id,
+          name: found.name,
+          emoji: found.emoji,
+          price: convertUsdToCurrent(found.baseUsd),
+          cycle: found.cycle || 'monthly',
+          active: true
+        };
+      }).filter(Boolean);
+
       onStateChange();
     }
 
     // ==========================================
     // URL STATE ENCODING & VIRAL LINK SHARING
     // ==========================================
+    function encodeCycleCode(cycle) {
+      if (cycle === 'daily') return 'd';
+      if (cycle === 'weekly') return 'w';
+      if (cycle === 'yearly') return 'y';
+      return 'm';
+    }
+
+    function decodeCycleCode(code) {
+      if (code === 'd') return 'daily';
+      if (code === 'w') return 'weekly';
+      if (code === 'y') return 'yearly';
+      return 'monthly';
+    }
+
     function syncUrlParams() {
       try {
         const params = new URLSearchParams();
+        if (currentMode !== 'subs') params.set('m', currentMode);
         params.set('c', currency.code);
         params.set('t', currentTheme);
         const nameVal = document.getElementById('customerNameInput').value.trim();
         if (nameVal && nameVal !== 'ALEX') params.set('n', nameVal);
 
         if (selectedSubs.length > 0) {
-          // Compact format: id:price:cycle
-          const encoded = selectedSubs.map(s => `${encodeURIComponent(s.id)}:${s.price}:${s.cycle === 'yearly' ? 'y' : 'm'}:${encodeURIComponent(s.name)}`).join('|');
+          const encoded = selectedSubs.map(s => `${encodeURIComponent(s.id)}:${s.price}:${encodeCycleCode(s.cycle)}:${encodeURIComponent(s.name)}`).join('|');
           params.set('s', encoded);
         }
         const newUrl = `${window.location.pathname}?${params.toString()}`;
@@ -1003,6 +1238,13 @@
 
     function loadFromUrlParams() {
       const params = new URLSearchParams(window.location.search);
+      const urlMode = params.get('m');
+      if (urlMode && MODE_CONFIG[urlMode]) {
+        switchMode(urlMode, params.has('s'));
+      } else {
+        switchMode('subs', params.has('s'));
+      }
+
       if (!params.has('s')) return false;
 
       const curCode = params.get('c') || 'USD';
@@ -1018,16 +1260,17 @@
       const holderName = params.get('n');
       if (holderName) document.getElementById('customerNameInput').value = holderName;
 
+      const allCatalog = getAllCatalogItems();
       const rawSubs = params.get('s') || '';
       selectedSubs = rawSubs.split('|').filter(Boolean).map(chunk => {
         const [id, priceStr, cyc, customName] = chunk.split(':');
-        const catalogItem = CATALOG.find(c => c.id === decodeURIComponent(id));
+        const catalogItem = allCatalog.find(c => c.id === decodeURIComponent(id));
         return {
           id: decodeURIComponent(id),
-          name: catalogItem ? catalogItem.name : decodeURIComponent(customName || 'Custom Sub'),
+          name: catalogItem ? catalogItem.name : decodeURIComponent(customName || 'Custom Item'),
           emoji: catalogItem ? catalogItem.emoji : '✨',
           price: parseFloat(priceStr) || 0,
-          cycle: cyc === 'y' ? 'yearly' : 'monthly',
+          cycle: decodeCycleCode(cyc),
           active: true
         };
       });
@@ -1040,7 +1283,7 @@
       window.history.replaceState({}, '', window.location.pathname);
       document.getElementById('sharedBanner').classList.add('hidden');
       document.getElementById('customerNameInput').value = 'YOU';
-      loadDemoPreset('bingeWatcher');
+      switchMode(currentMode, false);
     }
 
     function copyShareableUrl() {
@@ -1069,6 +1312,8 @@
     // ==========================================
     function downloadReceiptPNG() {
       const { activeItems, monthlyTotal, yearlyTotal, dailyCost, futureValue10Yr } = calculateTotals();
+      const cfg = getActiveConfig();
+      const avgUsdBenchmark = cfg.avgUsd || 91.00;
       const scale = 2;
       const width = 380;
       const itemRows = Math.max(1, activeItems.length);
@@ -1097,12 +1342,12 @@
       ctx.fillStyle = palette.fg;
       ctx.textAlign = 'center';
       ctx.font = 'bold 20px "Space Mono", monospace';
-      ctx.fillText('SUBSCRIPTION MART', width / 2, y);
+      ctx.fillText(cfg.storeTitle, width / 2, y);
 
       y += 18;
       ctx.fillStyle = palette.muted;
       ctx.font = '11px "Space Mono", monospace';
-      ctx.fillText('DIGITAL RECURRING CHARGES DIVISION', width / 2, y);
+      ctx.fillText(cfg.storeSub, width / 2, y);
 
       y += 16;
       const today = new Date().toISOString().slice(0, 10);
@@ -1146,15 +1391,15 @@
       if (activeItems.length === 0) {
         y += 24;
         ctx.textAlign = 'center';
-        ctx.fillText('NO ACTIVE SUBSCRIPTIONS', width / 2, y);
+        ctx.fillText('NO ACTIVE ITEMS', width / 2, y);
       } else {
         activeItems.forEach(item => {
           y += 24;
           const monthlyEq = getMonthlyEquivalent(item);
-          const suffix = item.cycle === 'yearly' ? ' (YR/12)' : '';
+          const lineLabel = formatReceiptLineLabel(item).slice(0, 26);
           ctx.textAlign = 'left';
           ctx.font = '12px "Space Mono", monospace';
-          ctx.fillText(`1x ${item.name.toUpperCase().slice(0, 22)}${suffix}`, padX, y);
+          ctx.fillText(lineLabel, padX, y);
           ctx.textAlign = 'right';
           ctx.font = 'bold 12px "Space Mono", monospace';
           ctx.fillText(formatMoney(monthlyEq), width - padX, y);
@@ -1165,7 +1410,7 @@
       drawDashedLine(y);
 
       const monthlyInUsd = monthlyTotal / currency.rate;
-      const diffPct = Math.round(((monthlyInUsd - US_AVERAGE_MONTHLY_USD) / US_AVERAGE_MONTHLY_USD) * 100);
+      const diffPct = Math.round(((monthlyInUsd - avgUsdBenchmark) / avgUsdBenchmark) * 100);
       const vsAvgText = diffPct > 0 ? `+${diffPct}% ABOVE AVG` : `${diffPct}% BELOW AVG`;
 
       y += 20;
@@ -1180,7 +1425,7 @@
       y += 18;
       ctx.textAlign = 'left';
       ctx.fillStyle = palette.muted;
-      ctx.fillText('VS. GLOBAL AVG ($91):', padX, y);
+      ctx.fillText(`VS. GLOBAL AVG ($${avgUsdBenchmark}):`, padX, y);
       ctx.textAlign = 'right';
       ctx.fillStyle = palette.fg;
       ctx.fillText(vsAvgText, width - padX, y);
@@ -1239,14 +1484,15 @@
       ctx.fillText('THANK YOU FOR YOUR MONEY • SUB-RECEIPT.PAGES.DEV', width / 2, y);
 
       const link = document.createElement('a');
-      link.download = `subscription-receipt-${today}.png`;
+      link.download = `${currentMode}-receipt-${today}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
     }
 
     function shareText() {
       const { activeItems, monthlyTotal, yearlyTotal, futureValue10Yr } = calculateTotals();
-      const text = `🧾 My Subscription Receipt:\n• Active Subs: ${activeItems.length}\n• Monthly Burn: ${formatMoney(monthlyTotal)}/mo\n• Yearly Damage: ${formatMoney(yearlyTotal)}/yr\n• 10-Yr S&P 500 Opportunity Cost: ${formatMoney(futureValue10Yr)}\n\nGenerate yours: ${window.location.href}`;
+      const cfg = getActiveConfig();
+      const text = `🧾 My ${cfg.storeTitle} Receipt:\n• Active Items: ${activeItems.length}\n• Monthly Burn: ${formatMoney(monthlyTotal)}/mo\n• Yearly Damage: ${formatMoney(yearlyTotal)}/yr\n• 10-Yr S&P 500 Opportunity Cost: ${formatMoney(futureValue10Yr)}\n\nGenerate yours: ${window.location.href}`;
       navigator.clipboard.writeText(text).then(() => {
         showToast('✓ Copied receipt summary & link to clipboard!');
       });
@@ -1260,15 +1506,7 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      const loadedFromUrl = loadFromUrlParams();
-      if (!loadedFromUrl) {
-        ['netflix', 'spotify', 'chatgpt', 'prime', 'icloud'].forEach(id => {
-          const found = CATALOG.find(c => c.id === id);
-          if (found) {
-            selectedSubs.push({ id: found.id, name: found.name, emoji: found.emoji, price: found.baseUsd, cycle: 'monthly', active: true });
-          }
-        });
-      }
+      loadFromUrlParams();
       renderCatalog();
       renderActiveList();
       renderReceiptAndBenchmark();
