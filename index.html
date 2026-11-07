@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SubReceipt — Turn Your Monthly Subscriptions Into a Viral Thermal Receipt</title>
+  <meta name="description" content="Free online subscription calculator and receipt generator. See your monthly burn, yearly damage, 10-year S&P 500 opportunity cost, and share your thermal receipt." />
+  <meta name="keywords" content="subscription calculator, receiptify subscriptions, subscription tracker, monthly expenses receipt, cancel subscriptions, personal finance tool" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Open Graph / Facebook / Discord / Reddit Preview Tags -->
+  <link rel="canonical" href="https://sub-receipt.pages.dev/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://sub-receipt.pages.dev/" />
+  <meta property="og:title" content="SubReceipt — What's Your Yearly Subscription Damage?" />
+  <meta property="og:description" content="Turn your recurring subscriptions (Netflix, ChatGPT, Spotify, iCloud) into a realistic thermal receipt & calculate your 10-year S&P 500 opportunity cost." />
+  <meta property="og:site_name" content="SubReceipt" />
+
+  <!-- Twitter / X Card Tags -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="SubReceipt — Turn Your Subscriptions Into a Thermal Receipt 🧾" />
+  <meta name="twitter:description" content="See your monthly burn rate, yearly damage, and how much your subscriptions would be worth in the S&P 500." />
+
+  <!-- Google Search Rich Snippet (JSON-LD SoftwareApplication Schema) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "SubReceipt",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Interactive subscription cost calculator and viral thermal receipt image generator."
+  }
+  </script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['"Space Mono"', '"JetBrains Mono"', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+    }
+    body {
+      background-color: #090a0f;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.13) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.1) 0px, transparent 50%);
+      color: #f8fafc;
+      min-height: 100vh;
+    }
+
+    .glass-card {
+      background: rgba(18, 20, 30, 0.78);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+    }
+
+    .service-chip {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .service-chip:hover {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: translateY(-1px);
+    }
+    .service-chip.selected {
+      background: rgba(99, 102, 241, 0.16);
+      border-color: rgba(129, 140, 248, 0.65);
+      box-shadow: 0 0 20px -4px rgba(99, 102, 241, 0.35);
+    }
+
+    /* Authentic Thermal Receipt Styling */
+    .receipt-wrapper {
+      filter: drop-shadow(0 25px 35px rgba(0, 0, 0, 0.65));
+      transition: transform 0.3s ease;
+    }
+
+    .receipt-paper {
+      position: relative;
+      width: 360px;
+      padding: 28px 26px 32px;
+      font-family: 'Space Mono', monospace;
+      line-height: 1.35;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      background-image: radial-gradient(rgba(0,0,0,0.03) 1px, transparent 0);
+      background-size: 6px 6px;
+    }
+
+    .paper-classic { background-color: #fbfaf8; color: #18181b; }
+    .paper-vintage { background-color: #f3ead8; color: #292524; }
+    .paper-cyber {
+      background-color: #14161f;
+      color: #e2e8f0;
+      border-left: 1px solid rgba(255,255,255,0.08);
+      border-right: 1px solid rgba(255,255,255,0.08);
+    }
+    .paper-rose { background-color: #fff0f5; color: #3f1d2b; }
+
+    .zigzag-top {
+      height: 10px;
+      width: 360px;
+      background: linear-gradient(-45deg, var(--paper-bg, #fbfaf8) 5px, transparent 0),
+                  linear-gradient(45deg, var(--paper-bg, #fbfaf8) 5px, transparent 0);
+      background-position: left bottom;
+      background-repeat: repeat-x;
+      background-size: 10px 10px;
+    }
+    .zigzag-bottom {
+      height: 10px;
+      width: 360px;
+      background: linear-gradient(-135deg, var(--paper-bg, #fbfaf8) 5px, transparent 0),
+                  linear-gradient(135deg, var(--paper-bg, #fbfaf8) 5px, transparent 0);
+      background-position: left top;
+      background-repeat: repeat-x;
+      background-size: 10px 10px;
+    }
+
+    .receipt-divider {
+      border-top: 1.5px dashed currentColor;
+      opacity: 0.35;
+      margin: 12px 0;
+    }
+
+    .stamp-badge {
+      border: 2px solid currentColor;
+      padding: 4px 10px;
+      transform: rotate(-3deg);
+      display: inline-block;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 99px; }
+  </style>
+</head>
+<body class="flex flex-col justify-between">
+
+  <!-- Shared URL Notification Banner (Appears when visiting a friend's shared link) -->
+  <div id="sharedBanner" class="hidden w-full bg-indigo-600/90 backdrop-blur-md text-white text-xs py-2.5 px-4 text-center font-medium flex items-center justify-center gap-3 z-40">
+    <span>👀 Viewing a shared Subscription Receipt! Customize it below to compare your own monthly burn.</span>
+    <button onclick="resetToDefaultUrl()" class="px-2.5 py-1 rounded-lg bg-white/20 hover:bg-white/30 text-[11px] font-bold transition">Create Mine</button>
+  </div>
+
+  <!-- =========================================================
+       HEADER NAVBAR
+       ========================================================= -->
+  <header class="w-full max-w-7xl mx-auto px-4 sm:px-8 py-4 flex items-center justify-between border-b border-white/5">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-2xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shadow-inner">
+        <i data-lucide="receipt" class="w-5 h-5"></i>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-lg tracking-tight text-white">SubReceipt</span>
+          <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/25">Free Finance Tool</span>
+        </div>
+        <p class="text-xs text-slate-400 hidden sm:block">Visualize your monthly subscription damage & opportunity cost</p>
+      </div>
+    </div>
+
+    <!-- Currency Switcher -->
+    <div class="flex items-center gap-2.5">
+      <div class="flex items-center bg-slate-900/90 border border-white/10 rounded-xl p-1 text-xs">
+        <button onclick="setCurrency('USD', '$', 1)" id="cur-USD" class="cur-btn px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-semibold transition">$ USD</button>
+        <button onclick="setCurrency('EUR', '€', 0.92)" id="cur-EUR" class="cur-btn px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition">€ EUR</button>
+        <button onclick="setCurrency('GBP', '£', 0.79)" id="cur-GBP" class="cur-btn px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition">£ GBP</button>
+        <button onclick="setCurrency('JPY', '¥', 150)" id="cur-JPY" class="cur-btn px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition">¥ JPY</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================
+       TOP DISPLAY AD SLOT (A-ADS UNIT 2461284)
+       ========================================================= -->
+  <div class="w-full max-w-5xl mx-auto px-4 pt-4">
+    <div class="w-full py-2 px-4 rounded-2xl border border-white/10 bg-slate-900/50 backdrop-blur-md flex flex-col items-center justify-center">
+      <!-- BEGIN AADS AD UNIT 2461284 -->
+      <div id="frame" style="width: 100%;margin: auto;position: relative; z-index: 99998;">
+        <iframe data-aa='2461284' src='//acceptable.a-ads.com/2461284/?size=Adaptive&background_color=transparent&title_color=818cf8&title_hover_color=818cf8&text_color=f8fafc&link_color=818cf8&link_hover_color=818cf8'
+          style='border:0; padding:0; width:70%; height:auto; overflow:hidden;display: block;margin: auto'></iframe>
+      </div>
+      <!-- END AADS AD UNIT 2461284 -->
+    </div>
+  </div>
+
+  <!-- =========================================================
+       MAIN WORKSPACE (LEFT: BUILDER & ANALYTICS | RIGHT: RECEIPT)
+       ========================================================= -->
+  <main class="w-full max-w-7xl mx-auto px-4 sm:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start flex-grow">
+
+    <!-- LEFT COLUMN: Subscription Picker, Customizer & Benchmark Analytics (7 Cols) -->
+    <div class="lg:col-span-7 flex flex-col gap-6">
+
+      <!-- Step 1: Quick-Select Popular Subscriptions -->
+      <section class="glass-card rounded-3xl p-5 sm:p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div>
+            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-indigo-500 text-white text-xs flex items-center justify-center">1</span>
+              Tap Your Active Subscriptions
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">Select from popular services below or add custom ones</p>
+          </div>
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <button onclick="loadDemoPreset('aiBro')" class="text-[11px] px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-indigo-300 border border-white/10 transition">
+              ⚡ AI Power User
+            </button>
+            <button onclick="loadDemoPreset('bingeWatcher')" class="text-[11px] px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-pink-300 border border-white/10 transition">
+              🍿 Streaming Addict
+            </button>
+            <button onclick="clearAllSubs()" class="text-[11px] px-2.5 py-1 rounded-lg bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 border border-white/10 transition">
+              Clear
+            </button>
+          </div>
+        </div>
+
+        <!-- Category Filter Tabs -->
+        <div class="flex gap-1.5 overflow-x-auto pb-2 mb-3 border-b border-white/5 text-xs">
+          <button onclick="filterCategory('all')" id="cat-all" class="cat-tab px-3 py-1.5 rounded-xl bg-white text-slate-950 font-semibold whitespace-nowrap transition">All Popular</button>
+          <button onclick="filterCategory('streaming')" id="cat-streaming" class="cat-tab px-3 py-1.5 rounded-xl bg-white/5 text-slate-300 hover:text-white whitespace-nowrap transition">🎬 Video & TV</button>
+          <button onclick="filterCategory('ai')" id="cat-ai" class="cat-tab px-3 py-1.5 rounded-xl bg-white/5 text-slate-300 hover:text-white whitespace-nowrap transition">🤖 AI & Dev</button>
+          <button onclick="filterCategory('music')" id="cat-music" class="cat-tab px-3 py-1.5 rounded-xl bg-white/5 text-slate-300 hover:text-white whitespace-nowrap transition">🎵 Music & Gaming</button>
+          <button onclick="filterCategory('lifestyle')" id="cat-lifestyle" class="cat-tab px-3 py-1.5 rounded-xl bg-white/5 text-slate-300 hover:text-white whitespace-nowrap transition">☁️ Cloud & Life</button>
+        </div>
+
+        <!-- Popular Services Grid -->
+        <div id="catalogGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 max-h-[260px] overflow-y-auto pr-1">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- Step 2: Fine-Tune Prices & "Kill-Switch" Savings Simulator -->
+      <section class="glass-card rounded-3xl p-5 sm:p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div>
+            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-indigo-500 text-white text-xs flex items-center justify-center">2</span>
+              Edit Prices & "Kill-Switch" Simulator
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">Uncheck the <span class="text-emerald-400 font-semibold">Keep</span> box on any item to simulate canceling it!</p>
+          </div>
+          <span id="selectedCountBadge" class="text-xs font-mono text-indigo-400">0 active</span>
+        </div>
+
+        <!-- Potential Savings Alert Box (Appears when user unchecks items to simulate canceling) -->
+        <div id="savingsSimBanner" class="hidden mb-4 p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-300 shrink-0">
+              <i data-lucide="Flame" class="w-4 h-4"></i>
+            </div>
+            <div class="text-xs">
+              <span class="text-emerald-200 font-semibold">Kill-Switch Active:</span>
+              <span class="text-slate-300"> Canceling <strong id="simPausedCount" class="text-white">1</strong> item(s) saves you </span>
+              <strong id="simYearlySaved" class="text-emerald-300 font-mono text-sm">$0/yr</strong>
+              <span class="text-slate-400"> (<strong id="sim10YrSaved" class="text-emerald-300 font-mono">$0</strong> in 10-yr S&P 500)!</span>
+            </div>
+          </div>
+          <button onclick="removePausedItemsPermanently()" class="text-[11px] px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold transition shrink-0">
+            Cut Them Forever ✂️
+          </button>
+        </div>
+
+        <!-- Add Custom Form -->
+        <form onsubmit="addCustomSub(event)" class="flex flex-wrap sm:flex-nowrap gap-2 mb-4 bg-slate-900/70 p-2.5 rounded-2xl border border-white/5">
+          <input type="text" id="customName" placeholder="Custom service (e.g. Gym, Patreon)" class="flex-1 min-w-[140px] bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500" required />
+          <div class="flex items-center gap-1.5 w-full sm:w-auto">
+            <input type="number" id="customPrice" step="0.01" min="0" placeholder="Price" class="w-24 bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500" required />
+            <select id="customCycle" class="bg-black/40 border border-white/10 rounded-xl px-2.5 py-2 text-xs text-slate-200 focus:outline-none">
+              <option value="monthly">/ mo</option>
+              <option value="yearly">/ yr</option>
+            </select>
+            <button type="submit" class="px-4 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white font-semibold text-xs transition whitespace-nowrap">
+              + Add
+            </button>
+          </div>
+        </form>
+
+        <!-- Active Selected Subscriptions List -->
+        <div id="activeSubsList" class="space-y-2 max-h-56 overflow-y-auto pr-1">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- Step 3: Global Benchmark Comparison & Category Breakdown -->
+      <section class="glass-card rounded-3xl p-5 sm:p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-bold text-white flex items-center gap-2">
+            <i data-lucide="bar-chart-3" class="w-4 h-4 text-indigo-400"></i>
+            Global Benchmark & Spending Breakdown
+          </h2>
+          <span id="benchmarkBadge" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+            Calculating...
+          </span>
+        </div>
+
+        <!-- Comparison Bar vs US/Global Average ($91/mo) -->
+        <div class="bg-slate-900/70 border border-white/5 rounded-2xl p-4 mb-4">
+          <div class="flex justify-between text-xs mb-1.5">
+            <span class="text-slate-400">Your Monthly Burn vs. Global Average (<span id="avgBenchmarkLabel">$91.00</span>/mo)</span>
+            <span id="benchmarkDiffText" class="font-mono font-bold text-white">$0.00</span>
+          </div>
+          <div class="w-full h-3 bg-slate-800 rounded-full overflow-hidden relative">
+            <!-- Average Marker Line at 50% -->
+            <div class="absolute left-1/2 top-0 bottom-0 w-0.5 bg-white/60 z-10" title="Global Average ($91 USD/mo)"></div>
+            <div id="benchmarkProgressBar" class="h-full bg-gradient-to-r from-emerald-400 via-indigo-500 to-rose-500 transition-all duration-500" style="width: 35%"></div>
+          </div>
+          <div class="flex justify-between text-[10px] text-slate-500 mt-1 font-mono">
+            <span>$0 (Monk Mode)</span>
+            <span>▲ Avg ($91 USD)</span>
+            <span>$180+ (Heavy)</span>
+          </div>
+        </div>
+
+        <!-- Receipt Personalization Row -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-white/5">
+          <div>
+            <label class="block text-xs text-slate-400 mb-1.5">Receipt Holder Name</label>
+            <input type="text" id="customerNameInput" value="ALEX" maxlength="20" oninput="onStateChange()" placeholder="YOUR NAME" class="w-full bg-slate-900 border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white uppercase font-mono focus:outline-none focus:border-indigo-500" />
+          </div>
+
+          <div>
+            <label class="block text-xs text-slate-400 mb-1.5">Thermal Paper Theme</label>
+            <div class="grid grid-cols-4 gap-1.5">
+              <button onclick="setPaperTheme('classic', '#fbfaf8')" id="theme-classic" class="theme-btn py-2 rounded-xl text-xs font-medium bg-white text-slate-900 border-2 border-indigo-500">Classic</button>
+              <button onclick="setPaperTheme('vintage', '#f3ead8')" id="theme-vintage" class="theme-btn py-2 rounded-xl text-xs font-medium bg-[#f3ead8] text-stone-800 border-2 border-transparent">Vintage</button>
+              <button onclick="setPaperTheme('rose', '#fff0f5')" id="theme-rose" class="theme-btn py-2 rounded-xl text-xs font-medium bg-[#fff0f5] text-rose-950 border-2 border-transparent">Pastel</button>
+              <button onclick="setPaperTheme('cyber', '#14161f')" id="theme-cyber" class="theme-btn py-2 rounded-xl text-xs font-medium bg-[#14161f] text-slate-200 border-2 border-white/10">Dark</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- High-RPM Finance Affiliate Banner -->
+      <section class="glass-card rounded-3xl p-4 border border-emerald-500/25 bg-gradient-to-r from-emerald-950/30 to-slate-900/60 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3.5">
+          <div class="w-11 h-11 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+            <i data-lucide="piggy-bank" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-semibold">Money Saver</span>
+              <h3 class="text-xs sm:text-sm font-bold text-white">Switch to Virtual Cards & Block Sneaky Price Hikes</h3>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">Set monthly spend limits or pause subscriptions anytime without calling customer support.</p>
+          </div>
+        </div>
+        <a href="https://asiafilm.org/4/1a4fdcd2993579abcda12534f716416e" target="_blank" rel="noopener noreferrer" class="shrink-0 px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition whitespace-nowrap shadow-lg shadow-emerald-500/20">
+          See Top Deals →
+        </a>
+      </section>
+
+    </div>
+
+    <!-- RIGHT COLUMN: Live Thermal Receipt Preview & Viral Share Controls (5 Cols) -->
+    <div class="lg:col-span-5 flex flex-col items-center sticky top-6">
+      
+      <!-- Action Bar Above Receipt -->
+      <div class="w-full max-w-[360px] grid grid-cols-12 gap-2 mb-3">
+        <button onclick="downloadReceiptPNG()" class="col-span-6 py-3 px-3 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-400 hover:to-purple-400 text-white font-bold text-xs shadow-xl shadow-indigo-500/25 flex items-center justify-center gap-1.5 transition active:scale-95">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          <span>Save PNG</span>
+        </button>
+        <button onclick="copyShareableUrl()" class="col-span-4 py-3 px-3 rounded-2xl glass-card hover:bg-white/10 text-indigo-300 font-semibold text-xs flex items-center justify-center gap-1.5 transition" title="Copy URL with your exact receipt items">
+          <i data-lucide="link" class="w-3.5 h-3.5"></i>
+          <span>Share Link</span>
+        </button>
+        <button onclick="shareText()" class="col-span-2 py-3 rounded-2xl glass-card hover:bg-white/10 text-white font-semibold text-xs flex items-center justify-center transition" title="Copy text summary for X / Reddit">
+          <i data-lucide="copy" class="w-4 h-4 text-slate-300"></i>
+        </button>
+      </div>
+
+      <p id="shareToast" class="text-xs text-emerald-400 font-medium mb-2 hidden">✓ Link copied to clipboard!</p>
+
+      <!-- THE THERMAL RECEIPT -->
+      <div class="receipt-wrapper my-1">
+        <!-- Serrated Top -->
+        <div id="zigzagTop" class="zigzag-top"></div>
+
+        <!-- Main Receipt Body -->
+        <div id="receiptPaper" class="receipt-paper paper-classic">
+          
+          <!-- Store Header -->
+          <div class="text-center">
+            <div class="text-xl font-bold tracking-widest">SUBSCRIPTION MART</div>
+            <div class="text-[11px] opacity-75 mt-0.5">DIGITAL RECURRING CHARGES DIVISION</div>
+            <div class="text-[10px] opacity-60 mt-1" id="receiptMetaDate">ORDER #4092 • 2026-11-07</div>
+            <div class="text-[11px] font-bold mt-1" id="receiptCustomerLabel">CUSTOMER: ALEX</div>
+          </div>
+
+          <div class="receipt-divider"></div>
+
+          <!-- Column Headers -->
+          <div class="flex justify-between text-[11px] font-bold opacity-75 mb-1.5">
+            <span>QTY  ITEM / SERVICE</span>
+            <span>PRICE/MO</span>
+          </div>
+
+          <div class="receipt-divider"></div>
+
+          <!-- Line Items -->
+          <div id="receiptItemsContainer" class="space-y-1.5 text-xs my-2">
+            <!-- Populated by JS -->
+          </div>
+
+          <div class="receipt-divider"></div>
+
+          <!-- Totals Section -->
+          <div class="space-y-1 text-xs">
+            <div class="flex justify-between">
+              <span class="opacity-75">ACTIVE SUBS:</span>
+              <span id="receiptItemCount" class="font-bold">0</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="opacity-75">DAILY BURN RATE:</span>
+              <span id="receiptDailyCost">$0.00 / day</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="opacity-75">VS. US AVG ($91/MO):</span>
+              <span id="receiptVsAvg" class="font-bold">0%</span>
+            </div>
+            <div class="flex justify-between text-sm font-bold pt-1">
+              <span>MONTHLY TOTAL:</span>
+              <span id="receiptMonthlyTotal">$0.00</span>
+            </div>
+            <div class="flex justify-between text-base font-bold pt-0.5">
+              <span>YEARLY DAMAGE:</span>
+              <span id="receiptYearlyTotal">$0.00 / yr</span>
+            </div>
+          </div>
+
+          <div class="receipt-divider"></div>
+
+          <!-- Viral Hook: 10-Year Opportunity Cost -->
+          <div class="bg-black/5 p-2.5 rounded text-[11px] space-y-1 my-2">
+            <div class="font-bold flex items-center justify-between">
+              <span>📈 10-YR S&P 500 VALUE:</span>
+              <span id="receiptInvested10Yr" class="underline font-bold">$0</span>
+            </div>
+            <div class="text-[10px] opacity-70 leading-tight">
+              If invested monthly in S&P 500 (8% avg return) instead of subscriptions.
+            </div>
+          </div>
+
+          <!-- Financial Roast / Status Stamp -->
+          <div class="text-center my-4">
+            <div id="receiptVerdictStamp" class="stamp-badge text-xs">
+              CERTIFIED STREAMING ADDICT
+            </div>
+          </div>
+
+          <!-- Fake Barcode SVG -->
+          <div class="flex flex-col items-center mt-3 pt-1">
+            <svg class="w-48 h-11 fill-current opacity-85" viewBox="0 0 200 40">
+              <rect x="4" y="0" width="3" height="36"/><rect x="10" y="0" width="1.5" height="36"/><rect x="15" y="0" width="4" height="36"/><rect x="22" y="0" width="1.5" height="36"/><rect x="26" y="0" width="3" height="36"/><rect x="33" y="0" width="6" height="36"/><rect x="42" y="0" width="1.5" height="36"/><rect x="46" y="0" width="3" height="36"/><rect x="52" y="0" width="4.5" height="36"/><rect x="60" y="0" width="1.5" height="36"/><rect x="65" y="0" width="3" height="36"/><rect x="72" y="0" width="1.5" height="36"/><rect x="77" y="0" width="5" height="36"/><rect x="85" y="0" width="2" height="36"/><rect x="90" y="0" width="3" height="36"/><rect x="97" y="0" width="1.5" height="36"/><rect x="102" y="0" width="6" height="36"/><rect x="111" y="0" width="2" height="36"/><rect x="116" y="0" width="3" height="36"/><rect x="122" y="0" width="1.5" height="36"/><rect x="127" y="0" width="4.5" height="36"/><rect x="135" y="0" width="2" height="36"/><rect x="140" y="0" width="3" height="36"/><rect x="147" y="0" width="5" height="36"/><rect x="155" y="0" width="1.5" height="36"/><rect x="160" y="0" width="3" height="36"/><rect x="166" y="0" width="4" height="36"/><rect x="174" y="0" width="1.5" height="36"/><rect x="179" y="0" width="5" height="36"/><rect x="187" y="0" width="2" height="36"/><rect x="192" y="0" width="4" height="36"/>
+            </svg>
+            <div class="text-[10px] tracking-[0.25em] opacity-65 mt-1">THANK YOU FOR YOUR MONEY</div>
+            <div class="text-[9px] opacity-45 mt-0.5">sub-receipt.pages.dev — no refunds on adulting</div>
+          </div>
+
+        </div>
+
+        <!-- Serrated Bottom -->
+        <div id="zigzagBottom" class="zigzag-bottom"></div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- =========================================================
+       SEO CONTENT & FAQ SECTION (Boosts Organic Google Search Rankings)
+       ========================================================= -->
+  <section class="w-full max-w-7xl mx-auto px-4 sm:px-8 py-10 border-t border-white/5 mt-8 grid grid-cols-1 md:grid-cols-3 gap-8 text-xs text-slate-400 leading-relaxed">
+    <div>
+      <h3 class="text-white font-bold text-sm mb-2">What is SubReceipt?</h3>
+      <p><strong>SubReceipt</strong> (inspired by Receiptify) turns your recurring monthly and annual subscriptions—like Netflix, Spotify, ChatGPT Plus, iCloud, and Xbox Game Pass—into a shareable thermal store receipt. Everything runs 100% locally in your browser with zero bank login required.</p>
+    </div>
+    <div>
+      <h3 class="text-white font-bold text-sm mb-2">How is the 10-Year S&P 500 Value Calculated?</h3>
+      <p>Subscription creep silently drains wealth. We calculate the future compound value of your monthly subscription total using the historical inflation-adjusted S&P 500 average return of <strong>8% per year</strong> compounded monthly over 120 months (10 years).</p>
+    </div>
+    <div>
+      <h3 class="text-white font-bold text-sm mb-2">How to Reduce Subscription Fatigue</h3>
+      <p>Use our built-in <strong>Kill-Switch Simulator</strong> in Step 2: uncheck services you barely use to immediately see how much cash you save per year. Rotating streaming services one month at a time can cut your entertainment bill by up to 65%.</p>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       FOOTER (With Google AdSense Required Legal Links)
+       ========================================================= -->
+  <footer class="w-full max-w-7xl mx-auto px-4 sm:px-8 py-6 border-t border-white/5 text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <p>© 2026 SubReceipt. 100% Client-Side Privacy — No financial data is stored on any server.</p>
+    <div class="flex items-center gap-5">
+      <button onclick="openModal('privacyModal')" class="hover:text-slate-300 transition">Privacy Policy</button>
+      <button onclick="openModal('termsModal')" class="hover:text-slate-300 transition">Terms of Use</button>
+      <button onclick="openModal('affiliateModal')" class="hover:text-slate-300 transition">Recommended Tools</button>
+    </div>
+  </footer>
+
+  <!-- =========================================================
+       MODALS (AdSense Privacy Policy, Terms & Affiliate Picks)
+       ========================================================= -->
+  <!-- Affiliate / Recommended Money Saving Tools Modal -->
+  <div id="affiliateModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-[100000] hidden flex items-center justify-center p-4">
+    <div class="glass-card max-w-lg w-full rounded-3xl p-6 border border-white/15 relative">
+      <button onclick="closeModal('affiliateModal')" class="absolute top-5 right-5 text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      <h3 class="text-base font-bold text-white flex items-center gap-2 mb-1">
+        <i data-lucide="shield-check" class="w-5 h-5 text-emerald-400"></i> Top 3 Ways to Slash Your Subscription Bill
+      </h3>
+      <p class="text-xs text-slate-400 mb-4">Hand-picked tools used by the r/personalfinance community:</p>
+      <div class="space-y-3 text-xs">
+        <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between gap-3">
+          <div>
+            <div class="font-bold text-white">1. Rocket Money (Subscription Canceler)</div>
+            <p class="text-slate-400 mt-0.5">Automatically detects forgotten recurring charges and cancels them for you.</p>
+          </div>
+          <a href="https://asiafilm.org/4/1a4fdcd2993579abcda12534f716416e" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-xl bg-emerald-500 text-slate-950 font-bold shrink-0">Try Free →</a>
+        </div>
+        <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between gap-3">
+          <div>
+            <div class="font-bold text-white">2. Privacy.com (Virtual Burner Cards)</div>
+            <p class="text-slate-400 mt-0.5">Create 1-click virtual cards with $1 limits so free trials can never auto-charge you.</p>
+          </div>
+          <a href="https://asiafilm.org/4/1a4fdcd2993579abcda12534f716416e" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-xl bg-indigo-500 text-white font-bold shrink-0">Get $5 Free →</a>
+        </div>
+        <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between gap-3">
+          <div>
+            <div class="font-bold text-white">3. Surfshark / NordVPN Bundle</div>
+            <p class="text-slate-400 mt-0.5">Save up to 70% on regional digital subscriptions and protect your browsing.</p>
+          </div>
+          <a href="https://asiafilm.org/4/1a4fdcd2993579abcda12534f716416e" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-xl bg-white/15 text-white font-bold shrink-0">View Deal →</a>
+        </div>
+      </div>
+      <p class="text-[10px] text-slate-500 mt-4">Disclosure: SubReceipt is free forever. We may earn a commission if you sign up through partner links above at zero extra cost to you.</p>
+    </div>
+  </div>
+
+  <!-- Privacy Policy Modal (Required for Google AdSense Approval) -->
+  <div id="privacyModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-[100000] hidden flex items-center justify-center p-4">
+    <div class="glass-card max-w-lg w-full rounded-3xl p-6 border border-white/15 relative max-h-[80vh] overflow-y-auto">
+      <button onclick="closeModal('privacyModal')" class="absolute top-5 right-5 text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      <h3 class="text-base font-bold text-white mb-3">Privacy Policy</h3>
+      <div class="space-y-3 text-xs text-slate-300 leading-relaxed">
+        <p><strong>1. 100% Client-Side Processing:</strong> SubReceipt calculates all subscription totals and generates receipt images directly inside your web browser. We do not collect, store, or transmit your personal financial entries to any backend database.</p>
+        <p><strong>2. Cookies & Third-Party Advertising (Google AdSense):</strong> Third-party vendors, including Google, use cookies to serve ads based on a user's prior visits to this website or other websites. Google's use of advertising cookies enables it and its partners to serve ads to users based on their visit to this site and/or other sites on the Internet. Users may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener" class="text-indigo-400 underline">Google Ads Settings</a>.</p>
+        <p><strong>3. Affiliate Links:</strong> This website participates in affiliate programs and may earn commissions from qualifying purchases or referrals.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Terms of Service Modal -->
+  <div id="termsModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-[100000] hidden flex items-center justify-center p-4">
+    <div class="glass-card max-w-lg w-full rounded-3xl p-6 border border-white/15 relative">
+      <button onclick="closeModal('termsModal')" class="absolute top-5 right-5 text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      <h3 class="text-base font-bold text-white mb-3">Terms of Use & Disclaimer</h3>
+      <div class="space-y-3 text-xs text-slate-300 leading-relaxed">
+        <p>SubReceipt is provided "as is" for informational and entertainment purposes only. Default subscription prices shown are estimates based on standard US plans and may vary by region or tier.</p>
+        <p>The 10-Year S&P 500 Opportunity Cost calculation is a hypothetical mathematical projection assuming an 8% annual return compounded monthly and does not constitute financial or investment advice.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       APPLICATION & VIRAL URL SYNC SCRIPT
+       ========================================================= -->
+  <script>
+    const US_AVERAGE_MONTHLY_USD = 91.00; // Average monthly subscription spend benchmark
+
+    const CATALOG = [
+      // Streaming
+      { id: 'netflix', name: 'Netflix Standard', category: 'streaming', baseUsd: 15.49, emoji: '🎬' },
+      { id: 'ytprem', name: 'YouTube Premium', category: 'streaming', baseUsd: 13.99, emoji: '▶️' },
+      { id: 'disney', name: 'Disney+ Bundle', category: 'streaming', baseUsd: 14.99, emoji: '🏰' },
+      { id: 'max', name: 'Max (HBO)', category: 'streaming', baseUsd: 16.99, emoji: '📺' },
+      { id: 'prime', name: 'Amazon Prime', category: 'streaming', baseUsd: 14.99, emoji: '📦' },
+      { id: 'crunchyroll', name: 'Crunchyroll', category: 'streaming', baseUsd: 9.99, emoji: '🍥' },
+      { id: 'hulu', name: 'Hulu (No Ads)', category: 'streaming', baseUsd: 17.99, emoji: '🟢' },
+      { id: 'appletv', name: 'Apple TV+', category: 'streaming', baseUsd: 9.99, emoji: '🍎' },
+
+      // AI & Dev
+      { id: 'chatgpt', name: 'ChatGPT Plus', category: 'ai', baseUsd: 20.00, emoji: '🤖' },
+      { id: 'claude', name: 'Claude Pro', category: 'ai', baseUsd: 20.00, emoji: '🧠' },
+      { id: 'cursor', name: 'Cursor Pro', category: 'ai', baseUsd: 20.00, emoji: '⚡' },
+      { id: 'midjourney', name: 'Midjourney', category: 'ai', baseUsd: 10.00, emoji: '🎨' },
+      { id: 'copilot', name: 'GitHub Copilot', category: 'ai', baseUsd: 10.00, emoji: '🐙' },
+      { id: 'perplexity', name: 'Perplexity Pro', category: 'ai', baseUsd: 20.00, emoji: '🔍' },
+
+      // Music & Gaming
+      { id: 'spotify', name: 'Spotify Premium', category: 'music', baseUsd: 11.99, emoji: '🎧' },
+      { id: 'applemusic', name: 'Apple Music', category: 'music', baseUsd: 10.99, emoji: '🎵' },
+      { id: 'gamepass', name: 'Xbox Game Pass', category: 'music', baseUsd: 19.99, emoji: '🎮' },
+      { id: 'psplus', name: 'PlayStation Plus', category: 'music', baseUsd: 14.99, emoji: '🕹️' },
+      { id: 'discord', name: 'Discord Nitro', category: 'music', baseUsd: 9.99, emoji: '👾' },
+      { id: 'audible', name: 'Audible Plus', category: 'music', baseUsd: 14.95, emoji: '📖' },
+
+      // Cloud & Lifestyle
+      { id: 'icloud', name: 'iCloud+ (2TB)', category: 'lifestyle', baseUsd: 9.99, emoji: '☁️' },
+      { id: 'googleone', name: 'Google One AI', category: 'lifestyle', baseUsd: 9.99, emoji: '🌈' },
+      { id: 'adobe', name: 'Adobe Creative Cloud', category: 'lifestyle', baseUsd: 59.99, emoji: '🖌️' },
+      { id: 'notion', name: 'Notion Plus', category: 'lifestyle', baseUsd: 10.00, emoji: '📝' },
+      { id: 'xprem', name: 'X Premium', category: 'lifestyle', baseUsd: 8.00, emoji: '✖️' },
+      { id: 'duolingo', name: 'Super Duolingo', category: 'lifestyle', baseUsd: 12.99, emoji: '🦉' },
+      { id: 'gym', name: 'Gym Membership', category: 'lifestyle', baseUsd: 45.00, emoji: '🏋️' },
+      { id: 'nytimes', name: 'NYT All Access', category: 'lifestyle', baseUsd: 17.00, emoji: '📰' }
+    ];
+
+    const CURRENCY_MAP = {
+      USD: { code: 'USD', symbol: '$', rate: 1 },
+      EUR: { code: 'EUR', symbol: '€', rate: 0.92 },
+      GBP: { code: 'GBP', symbol: '£', rate: 0.79 },
+      JPY: { code: 'JPY', symbol: '¥', rate: 150 }
+    };
+
+    let currentCategory = 'all';
+    let currency = CURRENCY_MAP.USD;
+    let currentTheme = 'classic';
+    // Each item: { id, name, emoji, price, cycle: 'monthly'|'yearly', active: true|false }
+    let selectedSubs = [];
+
+    function formatMoney(amount) {
+      if (currency.code === 'JPY') {
+        return `${currency.symbol}${Math.round(amount).toLocaleString()}`;
+      }
+      return `${currency.symbol}${amount.toFixed(2)}`;
+    }
+
+    function setCurrency(code, symbol, rate, skipConversion = false) {
+      const oldRate = currency.rate;
+      currency = { code, symbol, rate };
+
+      if (!skipConversion) {
+        selectedSubs = selectedSubs.map(item => {
+          const usdVal = item.price / oldRate;
+          const newVal = code === 'JPY' ? Math.round((usdVal * rate) / 10) * 10 : Number((usdVal * rate).toFixed(2));
+          return { ...item, price: newVal };
+        });
+      }
+
+      document.querySelectorAll('.cur-btn').forEach(btn => {
+        btn.className = 'cur-btn px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition';
+      });
+      const activeBtn = document.getElementById(`cur-${code}`);
+      if (activeBtn) activeBtn.className = 'cur-btn px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-semibold transition';
+
+      onStateChange();
+    }
+
+    function filterCategory(cat) {
+      currentCategory = cat;
+      document.querySelectorAll('.cat-tab').forEach(btn => {
+        btn.className = 'cat-tab px-3 py-1.5 rounded-xl bg-white/5 text-slate-300 hover:text-white whitespace-nowrap transition';
+      });
+      document.getElementById(`cat-${cat}`).className = 'cat-tab px-3 py-1.5 rounded-xl bg-white text-slate-950 font-semibold whitespace-nowrap transition';
+      renderCatalog();
+    }
+
+    function renderCatalog() {
+      const grid = document.getElementById('catalogGrid');
+      const items = currentCategory === 'all' ? CATALOG : CATALOG.filter(c => c.category === currentCategory);
+
+      grid.innerHTML = items.map(item => {
+        const isSelected = selectedSubs.some(s => s.id === item.id);
+        const convertedPrice = currency.code === 'JPY'
+          ? Math.round((item.baseUsd * currency.rate) / 10) * 10
+          : Number((item.baseUsd * currency.rate).toFixed(2));
+
+        return `
+          <button onclick="toggleCatalogItem('${item.id}')" class="service-chip ${isSelected ? 'selected' : ''} p-3 rounded-2xl text-left flex flex-col justify-between gap-1.5">
+            <div class="flex items-center justify-between w-full">
+              <span class="text-lg">${item.emoji}</span>
+              <span class="text-[11px] font-mono ${isSelected ? 'text-indigo-300 font-bold' : 'text-slate-400'}">${formatMoney(convertedPrice)}</span>
+            </div>
+            <div class="text-xs font-semibold text-white truncate w-full">${item.name}</div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function toggleCatalogItem(id) {
+      const exists = selectedSubs.some(s => s.id === id);
+      if (exists) {
+        selectedSubs = selectedSubs.filter(s => s.id !== id);
+      } else {
+        const found = CATALOG.find(c => c.id === id);
+        if (!found) return;
+        const price = currency.code === 'JPY'
+          ? Math.round((found.baseUsd * currency.rate) / 10) * 10
+          : Number((found.baseUsd * currency.rate).toFixed(2));
+        selectedSubs.push({
+          id: found.id,
+          name: found.name,
+          emoji: found.emoji,
+          price,
+          cycle: 'monthly',
+          active: true
+        });
+      }
+      onStateChange();
+    }
+
+    function addCustomSub(e) {
+      e.preventDefault();
+      const nameInput = document.getElementById('customName');
+      const priceInput = document.getElementById('customPrice');
+      const cycleInput = document.getElementById('customCycle');
+
+      const name = nameInput.value.trim();
+      const price = parseFloat(priceInput.value);
+      if (!name || isNaN(price)) return;
+
+      selectedSubs.push({
+        id: 'c_' + Date.now(),
+        name,
+        emoji: '✨',
+        price,
+        cycle: cycleInput.value,
+        active: true
+      });
+
+      nameInput.value = '';
+      priceInput.value = '';
+      onStateChange();
+    }
+
+    function toggleSubKeepStatus(id) {
+      selectedSubs = selectedSubs.map(s => s.id === id ? { ...s, active: !s.active } : s);
+      onStateChange();
+    }
+
+    function updateSubPrice(id, newPrice) {
+      const val = parseFloat(newPrice);
+      if (isNaN(val) || val < 0) return;
+      selectedSubs = selectedSubs.map(s => s.id === id ? { ...s, price: val } : s);
+      renderReceiptAndBenchmark();
+      syncUrlParams();
+    }
+
+    function updateSubCycle(id, newCycle) {
+      selectedSubs = selectedSubs.map(s => s.id === id ? { ...s, cycle: newCycle } : s);
+      onStateChange();
+    }
+
+    function removeSub(id) {
+      selectedSubs = selectedSubs.filter(s => s.id !== id);
+      onStateChange();
+    }
+
+    function removePausedItemsPermanently() {
+      selectedSubs = selectedSubs.filter(s => s.active !== false);
+      onStateChange();
+    }
+
+    function clearAllSubs() {
+      selectedSubs = [];
+      onStateChange();
+    }
+
+    function renderActiveList() {
+      const container = document.getElementById('activeSubsList');
+      const activeCount = selectedSubs.filter(s => s.active !== false).length;
+      document.getElementById('selectedCountBadge').textContent = `${activeCount} active / ${selectedSubs.length} total`;
+
+      if (selectedSubs.length === 0) {
+        container.innerHTML = `<div class="text-xs text-slate-500 text-center py-4">No subscriptions selected yet. Tap services above!</div>`;
+        return;
+      }
+
+      container.innerHTML = selectedSubs.map(s => {
+        const isKept = s.active !== false;
+        return `
+          <div class="flex items-center justify-between gap-2 ${isKept ? 'bg-white/5 border-white/5' : 'bg-rose-950/20 border-rose-500/20 opacity-60'} border px-3 py-2 rounded-xl text-xs transition">
+            <label class="flex items-center gap-2.5 min-w-0 flex-1 cursor-pointer">
+              <input type="checkbox" ${isKept ? 'checked' : ''} onchange="toggleSubKeepStatus('${s.id}')" title="Uncheck to simulate canceling this subscription" class="rounded bg-black/50 border-white/20 text-emerald-500 focus:ring-0" />
+              <span>${s.emoji}</span>
+              <span class="font-medium ${isKept ? 'text-white' : 'line-through text-slate-400'} truncate">${s.name}</span>
+            </label>
+            <div class="flex items-center gap-1.5">
+              <span class="text-slate-400 font-mono">${currency.symbol}</span>
+              <input type="number" step="0.01" value="${s.price}" oninput="updateSubPrice('${s.id}', this.value)" class="w-20 bg-black/50 border border-white/10 rounded-lg px-2 py-1 text-right font-mono text-white focus:outline-none focus:border-indigo-500" />
+              <select onchange="updateSubCycle('${s.id}', this.value)" class="bg-black/50 border border-white/10 rounded-lg px-1.5 py-1 text-slate-300">
+                <option value="monthly" ${s.cycle === 'monthly' ? 'selected' : ''}>/mo</option>
+                <option value="yearly" ${s.cycle === 'yearly' ? 'selected' : ''}>/yr</option>
+              </select>
+              <button onclick="removeSub('${s.id}')" class="p-1 text-slate-500 hover:text-rose-400 transition" title="Delete">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function getMonthlyEquivalent(item) {
+      return item.cycle === 'yearly' ? item.price / 12 : item.price;
+    }
+
+    function calcCompound10Yr(monthlyContribution) {
+      if (monthlyContribution <= 0) return 0;
+      const r = 0.08 / 12;
+      const n = 120;
+      return monthlyContribution * ((Math.pow(1 + r, n) - 1) / r);
+    }
+
+    function calculateTotals() {
+      const activeItems = selectedSubs.filter(s => s.active !== false);
+      const pausedItems = selectedSubs.filter(s => s.active === false);
+
+      const monthlyTotal = activeItems.reduce((acc, item) => acc + getMonthlyEquivalent(item), 0);
+      const yearlyTotal = monthlyTotal * 12;
+      const dailyCost = yearlyTotal / 365;
+      const futureValue10Yr = calcCompound10Yr(monthlyTotal);
+
+      const pausedMonthly = pausedItems.reduce((acc, item) => acc + getMonthlyEquivalent(item), 0);
+      const pausedYearly = pausedMonthly * 12;
+      const paused10Yr = calcCompound10Yr(pausedMonthly);
+
+      return {
+        activeItems,
+        pausedItems,
+        monthlyTotal,
+        yearlyTotal,
+        dailyCost,
+        futureValue10Yr,
+        pausedYearly,
+        paused10Yr
+      };
+    }
+
+    function getVerdictStamp(monthlyUsdEquivalent) {
+      if (monthlyUsdEquivalent === 0) return 'MONK MODE (ZERO SUBS)';
+      if (monthlyUsdEquivalent < 35) return 'FRUGAL MINIMALIST';
+      if (monthlyUsdEquivalent < 80) return 'BALANCED DIGITAL CITIZEN';
+      if (monthlyUsdEquivalent < 140) return 'CERTIFIED SUB COLLECTOR';
+      return 'CEO OF RECURRING CHARGES';
+    }
+
+    function renderReceiptAndBenchmark() {
+      const customer = (document.getElementById('customerNameInput').value || 'ALEX').toUpperCase();
+      const today = new Date().toISOString().slice(0, 10);
+
+      const {
+        activeItems,
+        pausedItems,
+        monthlyTotal,
+        yearlyTotal,
+        dailyCost,
+        futureValue10Yr,
+        pausedYearly,
+        paused10Yr
+      } = calculateTotals();
+
+      document.getElementById('receiptMetaDate').textContent = `ORDER #${1000 + activeItems.length * 37} • ${today}`;
+      document.getElementById('receiptCustomerLabel').textContent = `CUSTOMER: ${customer}`;
+
+      // Kill-Switch Simulator Banner
+      const simBanner = document.getElementById('savingsSimBanner');
+      if (pausedItems.length > 0) {
+        simBanner.classList.remove('hidden');
+        document.getElementById('simPausedCount').textContent = pausedItems.length;
+        document.getElementById('simYearlySaved').textContent = `${formatMoney(pausedYearly)}/yr`;
+        document.getElementById('sim10YrSaved').textContent = formatMoney(paused10Yr);
+      } else {
+        simBanner.classList.add('hidden');
+      }
+
+      // Receipt Items
+      const itemsContainer = document.getElementById('receiptItemsContainer');
+      if (activeItems.length === 0) {
+        itemsContainer.innerHTML = `<div class="text-center py-4 opacity-50">NO ACTIVE SUBSCRIPTIONS</div>`;
+      } else {
+        itemsContainer.innerHTML = activeItems.map((item) => {
+          const monthlyEq = getMonthlyEquivalent(item);
+          const suffix = item.cycle === 'yearly' ? ' (YR/12)' : '';
+          return `
+            <div class="flex justify-between items-baseline gap-2">
+              <span class="truncate">1x ${item.name.toUpperCase()}${suffix}</span>
+              <span class="font-bold shrink-0">${formatMoney(monthlyEq)}</span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Global Benchmark Comparison ($91 USD average)
+      const avgInCurrentCurrency = US_AVERAGE_MONTHLY_USD * currency.rate;
+      document.getElementById('avgBenchmarkLabel').textContent = formatMoney(avgInCurrentCurrency);
+
+      const monthlyInUsd = monthlyTotal / currency.rate;
+      const diffPct = Math.round(((monthlyInUsd - US_AVERAGE_MONTHLY_USD) / US_AVERAGE_MONTHLY_USD) * 100);
+      const vsAvgText = diffPct > 0 ? `+${diffPct}% ABOVE AVG` : `${diffPct}% BELOW AVG`;
+
+      document.getElementById('receiptItemCount').textContent = activeItems.length;
+      document.getElementById('receiptDailyCost').textContent = `${formatMoney(dailyCost)} / day`;
+      document.getElementById('receiptVsAvg').textContent = vsAvgText;
+      document.getElementById('receiptMonthlyTotal').textContent = formatMoney(monthlyTotal);
+      document.getElementById('receiptYearlyTotal').textContent = `${formatMoney(yearlyTotal)} / yr`;
+      document.getElementById('receiptInvested10Yr').textContent = formatMoney(futureValue10Yr);
+      document.getElementById('receiptVerdictStamp').textContent = getVerdictStamp(monthlyInUsd);
+
+      // Update Benchmark Bar UI
+      const barWidthPct = Math.min(100, Math.round((monthlyInUsd / (US_AVERAGE_MONTHLY_USD * 2)) * 100));
+      document.getElementById('benchmarkProgressBar').style.width = `${barWidthPct}%`;
+      document.getElementById('benchmarkDiffText').textContent = `${formatMoney(monthlyTotal)}/mo (${vsAvgText})`;
+
+      const badge = document.getElementById('benchmarkBadge');
+      if (monthlyInUsd <= US_AVERAGE_MONTHLY_USD) {
+        badge.textContent = `✅ ${Math.abs(diffPct)}% Below Global Avg`;
+        badge.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+      } else {
+        badge.textContent = `⚠️ ${diffPct}% Above Global Avg`;
+        badge.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30';
+      }
+    }
+
+    function setPaperTheme(themeName, hexColor, skipSync = false) {
+      currentTheme = themeName;
+      const paper = document.getElementById('receiptPaper');
+      paper.className = `receipt-paper paper-${themeName}`;
+      document.getElementById('zigzagTop').style.setProperty('--paper-bg', hexColor);
+      document.getElementById('zigzagBottom').style.setProperty('--paper-bg', hexColor);
+
+      document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('border-indigo-500'));
+      const activeBtn = document.getElementById(`theme-${themeName}`);
+      if (activeBtn) activeBtn.classList.add('border-indigo-500');
+
+      if (!skipSync) syncUrlParams();
+    }
+
+    function loadDemoPreset(preset) {
+      selectedSubs = [];
+      const ids = preset === 'aiBro'
+        ? ['chatgpt', 'claude', 'cursor', 'copilot', 'spotify', 'ytprem', 'xprem']
+        : ['netflix', 'disney', 'max', 'prime', 'ytprem', 'spotify', 'icloud'];
+
+      ids.forEach(id => {
+        const found = CATALOG.find(c => c.id === id);
+        if (found) {
+          const price = currency.code === 'JPY'
+            ? Math.round((found.baseUsd * currency.rate) / 10) * 10
+            : Number((found.baseUsd * currency.rate).toFixed(2));
+          selectedSubs.push({ id: found.id, name: found.name, emoji: found.emoji, price, cycle: 'monthly', active: true });
+        }
+      });
+      onStateChange();
+    }
+
+    // ==========================================
+    // URL STATE ENCODING & VIRAL LINK SHARING
+    // ==========================================
+    function syncUrlParams() {
+      try {
+        const params = new URLSearchParams();
+        params.set('c', currency.code);
+        params.set('t', currentTheme);
+        const nameVal = document.getElementById('customerNameInput').value.trim();
+        if (nameVal && nameVal !== 'ALEX') params.set('n', nameVal);
+
+        if (selectedSubs.length > 0) {
+          // Compact format: id:price:cycle
+          const encoded = selectedSubs.map(s => `${encodeURIComponent(s.id)}:${s.price}:${s.cycle === 'yearly' ? 'y' : 'm'}:${encodeURIComponent(s.name)}`).join('|');
+          params.set('s', encoded);
+        }
+        const newUrl = `${window.location.pathname}?${params.toString()}`;
+        window.history.replaceState({}, '', newUrl);
+      } catch (e) {}
+    }
+
+    function loadFromUrlParams() {
+      const params = new URLSearchParams(window.location.search);
+      if (!params.has('s')) return false;
+
+      const curCode = params.get('c') || 'USD';
+      if (CURRENCY_MAP[curCode]) {
+        const c = CURRENCY_MAP[curCode];
+        setCurrency(c.code, c.symbol, c.rate, true);
+      }
+
+      const theme = params.get('t') || 'classic';
+      const themeHexMap = { classic: '#fbfaf8', vintage: '#f3ead8', rose: '#fff0f5', cyber: '#14161f' };
+      if (themeHexMap[theme]) setPaperTheme(theme, themeHexMap[theme], true);
+
+      const holderName = params.get('n');
+      if (holderName) document.getElementById('customerNameInput').value = holderName;
+
+      const rawSubs = params.get('s') || '';
+      selectedSubs = rawSubs.split('|').filter(Boolean).map(chunk => {
+        const [id, priceStr, cyc, customName] = chunk.split(':');
+        const catalogItem = CATALOG.find(c => c.id === decodeURIComponent(id));
+        return {
+          id: decodeURIComponent(id),
+          name: catalogItem ? catalogItem.name : decodeURIComponent(customName || 'Custom Sub'),
+          emoji: catalogItem ? catalogItem.emoji : '✨',
+          price: parseFloat(priceStr) || 0,
+          cycle: cyc === 'y' ? 'yearly' : 'monthly',
+          active: true
+        };
+      });
+
+      document.getElementById('sharedBanner').classList.remove('hidden');
+      return true;
+    }
+
+    function resetToDefaultUrl() {
+      window.history.replaceState({}, '', window.location.pathname);
+      document.getElementById('sharedBanner').classList.add('hidden');
+      document.getElementById('customerNameInput').value = 'YOU';
+      loadDemoPreset('bingeWatcher');
+    }
+
+    function copyShareableUrl() {
+      syncUrlParams();
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        showToast('✓ Shareable Receipt URL copied to clipboard!');
+      });
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('shareToast');
+      toast.textContent = msg;
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 3200);
+    }
+
+    function onStateChange() {
+      renderCatalog();
+      renderActiveList();
+      renderReceiptAndBenchmark();
+      syncUrlParams();
+    }
+
+    // ==========================================
+    // HIGH-DPI PNG RECEIPT EXPORT
+    // ==========================================
+    function downloadReceiptPNG() {
+      const { activeItems, monthlyTotal, yearlyTotal, dailyCost, futureValue10Yr } = calculateTotals();
+      const scale = 2;
+      const width = 380;
+      const itemRows = Math.max(1, activeItems.length);
+      const height = 490 + itemRows * 26;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width * scale;
+      canvas.height = height * scale;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(scale, scale);
+
+      const themeColors = {
+        classic: { bg: '#fbfaf8', fg: '#18181b', muted: '#52525b', box: 'rgba(0,0,0,0.05)' },
+        vintage: { bg: '#f3ead8', fg: '#292524', muted: '#57534e', box: 'rgba(0,0,0,0.06)' },
+        rose:    { bg: '#fff0f5', fg: '#3f1d2b', muted: '#831843', box: 'rgba(0,0,0,0.05)' },
+        cyber:   { bg: '#14161f', fg: '#f1f5f9', muted: '#94a3b8', box: 'rgba(255,255,255,0.06)' }
+      };
+      const palette = themeColors[currentTheme] || themeColors.classic;
+
+      ctx.fillStyle = palette.bg;
+      ctx.fillRect(0, 0, width, height);
+
+      const padX = 28;
+      let y = 42;
+
+      ctx.fillStyle = palette.fg;
+      ctx.textAlign = 'center';
+      ctx.font = 'bold 20px "Space Mono", monospace';
+      ctx.fillText('SUBSCRIPTION MART', width / 2, y);
+
+      y += 18;
+      ctx.fillStyle = palette.muted;
+      ctx.font = '11px "Space Mono", monospace';
+      ctx.fillText('DIGITAL RECURRING CHARGES DIVISION', width / 2, y);
+
+      y += 16;
+      const today = new Date().toISOString().slice(0, 10);
+      ctx.fillText(`ORDER #${1000 + activeItems.length * 37} • ${today}`, width / 2, y);
+
+      y += 18;
+      ctx.fillStyle = palette.fg;
+      ctx.font = 'bold 12px "Space Mono", monospace';
+      const customer = (document.getElementById('customerNameInput').value || 'ALEX').toUpperCase();
+      ctx.fillText(`CUSTOMER: ${customer}`, width / 2, y);
+
+      const drawDashedLine = (yPos) => {
+        ctx.save();
+        ctx.strokeStyle = palette.muted;
+        ctx.globalAlpha = 0.4;
+        ctx.lineWidth = 1.2;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(padX, yPos);
+        ctx.lineTo(width - padX, yPos);
+        ctx.stroke();
+        ctx.restore();
+      };
+
+      y += 16;
+      drawDashedLine(y);
+
+      y += 18;
+      ctx.textAlign = 'left';
+      ctx.font = 'bold 11px "Space Mono", monospace';
+      ctx.fillStyle = palette.muted;
+      ctx.fillText('QTY  ITEM / SERVICE', padX, y);
+      ctx.textAlign = 'right';
+      ctx.fillText('PRICE/MO', width - padX, y);
+
+      y += 12;
+      drawDashedLine(y);
+
+      ctx.font = '12px "Space Mono", monospace';
+      ctx.fillStyle = palette.fg;
+      if (activeItems.length === 0) {
+        y += 24;
+        ctx.textAlign = 'center';
+        ctx.fillText('NO ACTIVE SUBSCRIPTIONS', width / 2, y);
+      } else {
+        activeItems.forEach(item => {
+          y += 24;
+          const monthlyEq = getMonthlyEquivalent(item);
+          const suffix = item.cycle === 'yearly' ? ' (YR/12)' : '';
+          ctx.textAlign = 'left';
+          ctx.font = '12px "Space Mono", monospace';
+          ctx.fillText(`1x ${item.name.toUpperCase().slice(0, 22)}${suffix}`, padX, y);
+          ctx.textAlign = 'right';
+          ctx.font = 'bold 12px "Space Mono", monospace';
+          ctx.fillText(formatMoney(monthlyEq), width - padX, y);
+        });
+      }
+
+      y += 16;
+      drawDashedLine(y);
+
+      const monthlyInUsd = monthlyTotal / currency.rate;
+      const diffPct = Math.round(((monthlyInUsd - US_AVERAGE_MONTHLY_USD) / US_AVERAGE_MONTHLY_USD) * 100);
+      const vsAvgText = diffPct > 0 ? `+${diffPct}% ABOVE AVG` : `${diffPct}% BELOW AVG`;
+
+      y += 20;
+      ctx.font = '12px "Space Mono", monospace';
+      ctx.textAlign = 'left';
+      ctx.fillStyle = palette.muted;
+      ctx.fillText('DAILY BURN RATE:', padX, y);
+      ctx.textAlign = 'right';
+      ctx.fillStyle = palette.fg;
+      ctx.fillText(`${formatMoney(dailyCost)} / day`, width - padX, y);
+
+      y += 18;
+      ctx.textAlign = 'left';
+      ctx.fillStyle = palette.muted;
+      ctx.fillText('VS. GLOBAL AVG ($91):', padX, y);
+      ctx.textAlign = 'right';
+      ctx.fillStyle = palette.fg;
+      ctx.fillText(vsAvgText, width - padX, y);
+
+      y += 22;
+      ctx.font = 'bold 14px "Space Mono", monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText('MONTHLY TOTAL:', padX, y);
+      ctx.textAlign = 'right';
+      ctx.fillText(formatMoney(monthlyTotal), width - padX, y);
+
+      y += 22;
+      ctx.font = 'bold 16px "Space Mono", monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText('YEARLY DAMAGE:', padX, y);
+      ctx.textAlign = 'right';
+      ctx.fillText(`${formatMoney(yearlyTotal)} / yr`, width - padX, y);
+
+      y += 16;
+      drawDashedLine(y);
+
+      y += 14;
+      ctx.fillStyle = palette.box;
+      ctx.fillRect(padX, y, width - padX * 2, 46);
+      ctx.fillStyle = palette.fg;
+      ctx.font = 'bold 11px "Space Mono", monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText('10-YR S&P 500 VALUE:', padX + 10, y + 18);
+      ctx.textAlign = 'right';
+      ctx.fillText(formatMoney(futureValue10Yr), width - padX - 10, y + 18);
+
+      ctx.fillStyle = palette.muted;
+      ctx.font = '10px "Space Mono", monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText('If invested monthly at 8% avg return.', padX + 10, y + 35);
+
+      y += 74;
+      const verdict = getVerdictStamp(monthlyInUsd);
+      ctx.save();
+      ctx.translate(width / 2, y);
+      ctx.rotate(-0.04);
+      ctx.strokeStyle = palette.fg;
+      ctx.lineWidth = 2;
+      const stampW = ctx.measureText(verdict).width + 36;
+      ctx.strokeRect(-stampW / 2, -16, stampW, 24);
+      ctx.font = 'bold 11px "Space Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = palette.fg;
+      ctx.fillText(verdict, 0, 0);
+      ctx.restore();
+
+      y += 38;
+      ctx.textAlign = 'center';
+      ctx.fillStyle = palette.muted;
+      ctx.font = '10px "Space Mono", monospace';
+      ctx.fillText('THANK YOU FOR YOUR MONEY • SUB-RECEIPT.PAGES.DEV', width / 2, y);
+
+      const link = document.createElement('a');
+      link.download = `subscription-receipt-${today}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    function shareText() {
+      const { activeItems, monthlyTotal, yearlyTotal, futureValue10Yr } = calculateTotals();
+      const text = `🧾 My Subscription Receipt:\n• Active Subs: ${activeItems.length}\n• Monthly Burn: ${formatMoney(monthlyTotal)}/mo\n• Yearly Damage: ${formatMoney(yearlyTotal)}/yr\n• 10-Yr S&P 500 Opportunity Cost: ${formatMoney(futureValue10Yr)}\n\nGenerate yours: ${window.location.href}`;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('✓ Copied receipt summary & link to clipboard!');
+      });
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const loadedFromUrl = loadFromUrlParams();
+      if (!loadedFromUrl) {
+        ['netflix', 'spotify', 'chatgpt', 'prime', 'icloud'].forEach(id => {
+          const found = CATALOG.find(c => c.id === id);
+          if (found) {
+            selectedSubs.push({ id: found.id, name: found.name, emoji: found.emoji, price: found.baseUsd, cycle: 'monthly', active: true });
+          }
+        });
+      }
+      renderCatalog();
+      renderActiveList();
+      renderReceiptAndBenchmark();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
